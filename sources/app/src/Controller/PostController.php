@@ -95,9 +95,9 @@ final class PostController extends AbstractController
      */
     public function uploadVideo(Request $request)
     {
+
         $userId = $request->request->get('userId');
         $categoryId = $request->request->get('categoryId');
-
         $video = new Video();
 
         try {
@@ -128,7 +128,7 @@ final class PostController extends AbstractController
             return new JsonResponse($newFilename, Response::HTTP_CREATED, [], true);
 
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
     }
 

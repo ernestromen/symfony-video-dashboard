@@ -20,12 +20,13 @@ services:
       APACHE_DOCUMENT_ROOT: "public/"
       PHP_EXTENSION_XDEBUG: "1"
       PHP_INI_MEMORY_LIMIT: "1G"
+      # Symfony
       APP_ENV: "dev"
       APP_SECRET: "8d2a5c935d8ef1c0e2b751147382bc75"
       DATABASE_URL: "mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql:3306/$MYSQL_DATABASE"
     volumes:
       - ./sources/app:/var/www/html:rw
-      - ./php-config/php.ini:/usr/local/etc/php/conf.d/custom.ini  # Custom php.ini path
+      - ./php-config/php.ini:/usr/local/etc/php/conf.d/custom.ini  # Mount the custom php.ini file here
 
   mysql:
     image: mysql:5.7
