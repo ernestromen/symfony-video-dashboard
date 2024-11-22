@@ -6,9 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table(name="categories")
  */
 class Category
 {
+    
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Video", mappedBy="category")
      */
@@ -24,7 +27,7 @@ class Category
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $category_name;
+    private $name;
 
     public function __construct()
     {
@@ -45,14 +48,14 @@ class Category
         return $this->id;
     }
 
-    public function getCategoryName(): ?string
+    public function getName(): ?string
     {
-        return $this->category_name;
+        return $this->name;
     }
 
-    public function setCategoryName(string $category_name): self
+    public function setName(string $name): self
     {
-        $this->category_name = $category_name;
+        $this->name = $name;
 
         return $this;
     }

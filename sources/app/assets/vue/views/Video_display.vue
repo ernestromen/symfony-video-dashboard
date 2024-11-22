@@ -37,7 +37,10 @@
               >
                 <!-- start here -->
   
-                <div class="border pl-3 py-2">
+                <div
+                  class="border pl-3 py-2"
+                  @click="changeVideoFilePath(video.videoFilePath)"
+                >
                   {{ video.videoFilePath }}
                 </div>
   
@@ -82,8 +85,11 @@
                 <!-- start here -->
   
                 <div class="border pl-3 py-2">
-                  <a :href="`category/${category.id}`">
-                    {{ category.categoryName }}
+                  <a
+                    class="text-light"
+                    :href="`category/${category.id}`"
+                  >
+                    {{ category.name }}
                   </a>
                 </div>
   
@@ -103,18 +109,22 @@
         </div>
         <div class="col-12">
           <p class="text-center">
-            <iframe
-              width="560"
-              height="315" 
-              src="/uploads/videos/file-67330f7711aa0.mp4"
-              title="YouTube video player" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; 
-               encrypted-media; gyroscope; 
-               picture-in-picture; web-share" 
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            />
+            <template v-if="mainVideoPath">
+              <video
+                controls="true"
+                class="embed-responsive-item"
+                width="560"
+                height="315"
+              >
+                <source
+                  :src="`/uploads/videos/${mainVideoPath}`"
+                  type="video/mp4"
+                >
+              </video>
+            </template>
+            <template v-else>
+              <p>No video available</p>
+            </template>
           </p>
         </div>
       </div>
@@ -136,6 +146,7 @@
         entities:'users',
         videoFile: null,
         inputData: '',
+        mainVideoPath:'',
         csrfToken: ''
       };
     },
@@ -152,11 +163,15 @@
       this.getAllCategories();  
     },
     methods: {
+      changeVideoFilePath(path){
+        this.mainVideoPath = path;
+
+      },
       check(event){
         const spanText = event.target.querySelector("span").textContent;
   
-  
       if(spanText == 'Categories'){
+
         this.first_th = 'Category ID';
         this.second_th = 'Category Name';
   
@@ -179,7 +194,6 @@
   
         this.entities = 'videos';
   
-  
       }
 
       this.getAllEntities();
@@ -199,7 +213,11 @@
         axios
           .get("http://app.localhost/api/get-videos")
           .then((res) => {
+
             this.videos = res.data;
+
+            this.mainVideoPath = res.data[0].videoFilePath;
+
           })
           .catch(() => {
           });

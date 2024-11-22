@@ -31,7 +31,7 @@ final class PostController extends AbstractController
     /** @var SerializerInterface */
     private $serializer;
 
-        public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
     {
         $this->em = $em;
         $this->serializer = $serializer;
@@ -63,7 +63,6 @@ final class PostController extends AbstractController
      */
     public function findAllAction(): JsonResponse
     {
-        
         $posts = $this->em->getRepository(Post::class)->findBy([], ['id' => 'DESC']);
         $data = $this->serializer->serialize($posts, JsonEncoder::FORMAT);
 
@@ -77,12 +76,8 @@ final class PostController extends AbstractController
     {
         try {
             $videos = $this->em->getRepository(Video::class)->findAll();
-            // $category = $this->em->getRepository(Category::class)->findOneBy([]);
-
             $data = $this->serializer->serialize($videos, JsonEncoder::FORMAT);
-            // $videos = $category->getVideos(); 
-            // dd($videos->toArray());
-            // getVideos
+
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 
         } catch (\Exception $e) {
@@ -143,7 +138,7 @@ final class PostController extends AbstractController
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
 
     }
@@ -161,7 +156,6 @@ final class PostController extends AbstractController
         } catch (\Exception $e) {
             echo new Response($e->getMessage(), 500);
         }
-
     }
 
     /**
@@ -169,6 +163,12 @@ final class PostController extends AbstractController
      */
     public function deleteVideo($id)
     {
+
+        $videoToDelete = $this->em->getRepository(Video::class)->find($id);
+        $videoFilePath = $videoToDelete->getVideoName();
+        $videoPath = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/' . $videoFilePath;
+        unlink($videoPath);
+
         try {
             $videoToDelete = $this->em->getRepository(Video::class)->find($id);
 
@@ -193,7 +193,6 @@ final class PostController extends AbstractController
      */
     public function editVideo($id)
     {
- 
         try {
             $videoToEdit = $this->em->getRepository(Video::class)->find($id);
             $data = $this->serializer->serialize($videoToEdit, JsonEncoder::FORMAT);
@@ -219,7 +218,7 @@ final class PostController extends AbstractController
             if (!$videoToUpdate) {
                 throw $this->createNotFoundException('Video not found.');
             }
-            
+
             $videoToUpdate->setVideoFilePath($request->request->get('videoFilePath'));
 
             $this->em->persist($videoToUpdate);
@@ -259,8 +258,6 @@ final class PostController extends AbstractController
         } catch (\Exception $e) {
             echo new Response($e->getMessage(), 500);
         }
-
-        
     }
 
 
@@ -269,7 +266,6 @@ final class PostController extends AbstractController
      */
     public function editCategory($id)
     {
- 
         try {
             $categoryToEdit = $this->em->getRepository(Category::class)->find($id);
             $data = $this->serializer->serialize($categoryToEdit, JsonEncoder::FORMAT);
@@ -311,11 +307,6 @@ final class PostController extends AbstractController
 
     }
 
-
-
-     //crud for user
-
-
     /**
      * @Rest\Delete("/delete-user/{id}", name="deleteUser")
      */
@@ -336,8 +327,6 @@ final class PostController extends AbstractController
         } catch (\Exception $e) {
             echo new Response($e->getMessage(), 500);
         }
-
-        
     }
 
 
@@ -346,7 +335,7 @@ final class PostController extends AbstractController
      */
     public function editUser($id)
     {
- 
+
         try {
             $userToEdit = $this->em->getRepository(User::class)->find($id);
             $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT);

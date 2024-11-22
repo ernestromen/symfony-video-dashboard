@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store";
-import Home from "../views/Home";
 import Login from "../views/Login";
 import Posts from "../views/Posts";
 import Dashboard from "../views/Dashboard";
@@ -21,7 +20,7 @@ let router = new VueRouter({
     { path: "/", component: VideoDisplay },
 
     { path: "/dashboard", component: Dashboard },
-    { path: "/home", component: Home },
+    { path: "/", component: VideoDisplay },
     { path: "/login", component: Login },
     { path: "/posts", component: Posts, meta: { requiresAuth: true } },
         {

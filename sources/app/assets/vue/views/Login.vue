@@ -87,7 +87,7 @@ export default {
       if (typeof redirect !== "undefined") {
         this.$router.push({path: redirect});
       } else {
-        this.$router.push({path: "/home"});
+        this.$router.push({path: "/"});
       }
     }
   },
@@ -101,7 +101,7 @@ export default {
         if (typeof redirect !== "undefined") {
           this.$router.push({path: redirect});
         } else {
-          this.$router.push({path: "/home"});
+          this.$router.push({path: "/"});
         }
       }
     }

@@ -97,13 +97,6 @@ export default {
           console.log(error, 'this is my error');
         });
     }
-
-
-
-
-
-
-
   },
 };
 </script>

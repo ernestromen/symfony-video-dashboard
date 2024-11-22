@@ -1,16 +1,20 @@
 <?php
 
 namespace App\Entity;
+use App\Entity\Traits\TimestampableTrait;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VideoRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\Table(name="videos")
  */
 
 class Video
 {
+    use TimestampableTrait;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -101,46 +105,5 @@ class Video
 
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(?\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    /**
- * Gets triggered only on insert
-
- * @ORM\PrePersist
- */
-    public function onPrePersist()
-    {
-        $this->created = new \DateTime("now");
-    }
-    /**
-     * @ORM\PreUpdate
-     */
-    public function onPreUpdate()
-    {
-        $this->updated_at = new \DateTime("now");
-        ;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
+    
 }

@@ -11,6 +11,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Traits\TimestampableTrait;
 
 /**
  * @ORM\Entity
@@ -19,6 +20,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface
 {
+    use TimestampableTrait;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid", unique=true)
@@ -57,18 +60,18 @@ class User implements UserInterface
     private $roles;
 
     /**
-     * @ORM\Column(name="created", type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      *
      * @var DateTime
      */
-    private $created;
+    private $created_at;
 
     /**
-     * @ORM\Column(name="updated", type="datetime", nullable=true)
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      *
      * @var DateTime
      */
-    private $updated;
+    private $updated_at;
 
     public function __construct()
     {
@@ -83,15 +86,7 @@ class User implements UserInterface
     public function onPrePersist(): void
     {
         $this->id = Uuid::uuid4();
-        $this->created = new DateTime('NOW');
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function onPreUpdate(): void
-    {
-        $this->updated = new DateTime('NOW');
+        $this->created_at = new DateTime('now');
     }
 
     public function getId(): UuidInterface
@@ -166,15 +161,5 @@ class User implements UserInterface
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
-    }
-
-    public function getCreated(): DateTime
-    {
-        return $this->created;
-    }
-
-    public function getUpdated(): ?DateTime
-    {
-        return $this->updated;
     }
 }

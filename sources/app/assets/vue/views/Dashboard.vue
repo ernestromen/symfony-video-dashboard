@@ -200,7 +200,7 @@ export default {
       this.second_th = 'Category Name';
 
       this.first_td = 'id';
-      this.second_td = 'categoryName';
+      this.second_td = 'name';
 
       this.entity_type = 'category';
 
