@@ -35,10 +35,31 @@
           :key="category.id"
           :value="category.id"
         >
-          {{ category.categoryName }}
+          {{ category.name }}
         </option>
       </select>
     </div>
+    <!-- <div class="form-group">
+      <select
+        class="form-control custom-select"
+        name="categoryId" 
+      >
+        <option
+          value=""
+          disabled
+          selected
+        >
+          Select an option
+        </option>
+        <option
+          v-for="user in users"
+          :key="user.id"
+          :value="user.roles[0]"
+        >
+          {{ user.roles[0] }}
+        </option>
+      </select>
+    </div> -->
     <button
       type="submit"
       class="btn btn-primary btn-block mb-5 "
@@ -54,7 +75,8 @@ export default {
 
   data: function () {
     return {
-      csrfToken: ''
+      csrfToken: '',
+      users: []
     };
   },
   computed: {
@@ -70,7 +92,7 @@ export default {
 
   },
   mounted() {
-
+this.getAllUsers();
   },
   methods: {
 
@@ -95,6 +117,15 @@ export default {
         })
         .catch((error) => {
           console.log(error, 'this is my error');
+        });
+    },
+    getAllUsers(){
+      axios.get('http://app.localhost/api/get-users')
+        .then((res) => {
+         console.log(res.data[0].roles[0]);
+         this.users =res.data; 
+        })
+        .catch(() => {
         });
     }
   },

@@ -12,6 +12,9 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity
@@ -25,16 +28,24 @@ class User implements UserInterface
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid", unique=true)
-     *
+     * @Groups({"user:read"})
+
      * @var UuidInterface
      */
     private $id;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user")
+     */
+    private $userRoles;
 
     /**
      * @ORM\Column(name="login", type="string", unique=true)
      *
      * @var string
      * @Assert\NotBlank()
+     * @Groups({"user:read"})
+
      */
     private $login;
 
@@ -53,9 +64,9 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\Column(name="roles", type="simple_array")
-     *
-     * @var string[]
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="users")
+     * @ORM\JoinTable(name="user_role")
+     * @Groups({"user:read"})
      */
     private $roles;
 
@@ -75,7 +86,7 @@ class User implements UserInterface
 
     public function __construct()
     {
-        $this->roles = [];
+        $this->roles = new ArrayCollection();
     }
 
     /**
@@ -144,8 +155,20 @@ class User implements UserInterface
 
     /**
      * @return string[]
+     * @Groups({"user:read"})
      */
     public function getRoles(): array
+    {
+        return $this->roles->map(function (Role $role) {
+            return $role->getName(); // Assuming Role entity has getName() method
+        })->toArray();
+    }
+
+    /**
+     * @return Collection|Role[]
+     * @Groups({"user:read"})
+     */
+    public function getCollectionRoles()
     {
         return $this->roles;
     }

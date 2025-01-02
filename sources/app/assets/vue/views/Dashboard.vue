@@ -94,6 +94,13 @@
         {{ entities }}
       </h1>
 
+      <button
+        v-if="entities === 'videos'"
+        class="btn btn-success"
+        @click="filter"
+      >
+        Filter
+      </button>
       <!-- experimental table -->
       <table class="table table-striped border mt-5">
         <thead>
@@ -190,6 +197,12 @@ export default {
 
   },
   methods: {
+
+    filter(){
+      if(this.entities == 'videos'){
+        this.list = this.list.filter(entity => entity.categoryId == 27);
+      }
+    },
     check(event){
       console.log(event.target,'event.target');
       const spanText = event.target.querySelector("span").textContent;
@@ -209,10 +222,10 @@ export default {
     }else if(spanText == 'Videos'){
 console.log('here');
       this.first_th = 'Video Name';
-      this.second_th = 'Video Path';
+      this.second_th = 'Category ID';
 
       this.first_td = 'videoName';
-      this.second_td = 'videoFilePath';
+      this.second_td = 'categoryId';
 
       this.entity_type = 'video';
 

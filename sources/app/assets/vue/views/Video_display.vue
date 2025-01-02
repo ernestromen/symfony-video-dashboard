@@ -7,15 +7,14 @@
             <nav
               class="navbar navbar-dark navbar-toggler bg-dark"
               data-toggle="collapse"
-              data-target="#navbarToggleExternalContent2"
-              @click="check($event)"
+              data-target="#navbarToggleExternalContentForAllVideos"
             >
               <span
                 class="navbar-toggler"
                 type="button"
                 data-toggle="collapse"
-                data-target="#navbarToggleExternalContent2"
-                aria-controls="navbarToggleExternalContent2"
+                data-target="#navbarToggleExternalContentForAllVideos"
+                aria-controls="navbarToggleExternalContentForAllVideos"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
                 style="pointer-events: none;"
@@ -27,7 +26,7 @@
               </span>
             </nav>
             <div
-              id="navbarToggleExternalContent2"
+              id="navbarToggleExternalContentForAllVideos"
               class="collapse"
             >
               <div
@@ -36,14 +35,14 @@
                 class="bg-dark"
               >
                 <!-- start here -->
-  
+
                 <div
                   class="border pl-3 py-2"
                   @click="changeVideoFilePath(video.videoFilePath)"
                 >
                   {{ video.videoFilePath }}
                 </div>
-  
+
                 <!-- end here -->
               </div>
             </div>
@@ -54,15 +53,14 @@
             <nav
               class="navbar navbar-dark navbar-toggler bg-dark"
               data-toggle="collapse"
-              data-target="#navbarToggleExternalContent3"
-              @click="check($event)"
+              data-target="#navbarToggleExternalContentForCategories"
             >
               <span
                 class="navbar-toggler"
                 type="button"
                 data-toggle="collapse"
-                data-target="#navbarToggleExternalContent3"
-                aria-controls="navbarToggleExternalContent3"
+                data-target="#navbarToggleExternalContentForCategories"
+                aria-controls="navbarToggleExternalContentForCategories"
                 aria-expanded="false"
                 aria-label="Toggle navigation"
                 style="pointer-events: none;"
@@ -74,7 +72,7 @@
               </span>
             </nav>
             <div
-              id="navbarToggleExternalContent3"
+              id="navbarToggleExternalContentForCategories"
               class="collapse"
             >
               <div
@@ -83,16 +81,64 @@
                 class="bg-dark"
               >
                 <!-- start here -->
-  
+
                 <div class="border pl-3 py-2">
-                  <a
-                    class="text-light"
-                    :href="`category/${category.id}`"
+                  <!-- experiment -->
+                  <nav
+                    class="navbar navbar-dark navbar-toggler bg-dark"
+                    data-toggle="collapse"
+                    :data-target="`#navbarToggleExternalContent${category.id}`"
                   >
-                    {{ category.name }}
-                  </a>
+                    <span
+                      class="navbar-toggler"
+                      type="button"
+                      data-toggle="collapse"
+                      :data-target="`#navbarToggleExternalContent${category.id}`"
+                      :aria-controls="`navbarToggleExternalContent${category.id}`"
+                      aria-expanded="false"
+                      aria-label="Toggle navigation"
+                      style="pointer-events: none;"
+                    >
+                      <span
+                        class="tab_name"
+                        style="pointer-events: none;"
+                      >{{ category.name }}</span>
+                    </span>
+                  </nav>
+                  <!-- end experiment -->
+                  <div
+                    id="navbarToggleExternalContentForCategories"
+                    class="collapse"
+                  >
+                    <div
+                      v-for="categoryVideo in category.videos"
+                      
+                      :id="`navbarToggleExternalContent${category.id}`"
+                      :key="categoryVideo.id"
+                      class="collapse ID HERE!"
+                    >
+                      <div
+                        class="border pl-3 py-2"
+                        @click="changeVideoFilePath(categoryVideo.videoFilePath)"
+                      >
+                        {{ categoryVideo.videoFilePath }}
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div
+                    id="navbarToggleExternalContent4"
+                    class="collapse"
+                  >
+                    testing2
+                  </div>
+                  <div
+                    id="navbarToggleExternalContent4"
+                    class="collapse"
+                  >
+                    testing3
+                  </div> -->
                 </div>
-  
+
                 <!-- end here -->
               </div>
             </div>
@@ -111,6 +157,7 @@
           <p class="text-center">
             <template v-if="mainVideoPath">
               <video
+                :key="mainVideoPath"
                 controls="true"
                 class="embed-responsive-item"
                 width="560"
@@ -131,108 +178,78 @@
     </div>
   </div>
 </template>
-  
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data: function () {
-      return {
-        videos: [],
-        categories: [],
-        users: [],
-        list:[],
-        entities:'users',
-        videoFile: null,
-        inputData: '',
-        mainVideoPath:'',
-        csrfToken: ''
-      };
+
+
+<script>
+import axios from "axios";
+
+export default {
+  data: function () {
+    return {
+      videos: [],
+      categories: [],
+      users: [],
+      list: [],
+      entities: 'users',
+      videoFile: null,
+      inputData: '',
+      mainVideoPath: '',
+      csrfToken: ''
+    };
+  },
+  computed: {
+
+  },
+  created() {
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    // console.log(this.$store.getters["security/getUser"].id);
+
+  },
+  mounted() {
+    this.getAllvideos();
+    this.getAllCategories();
+  },
+  methods: {
+    changeVideoFilePath(path) {
+      this.mainVideoPath = path;
+
     },
-    computed: {
-  
+
+
+    getAllEntities() {
+      axios.get(`http://app.localhost/api/get-${this.entities}`)
+        .then((res) => {
+          this.list = res.data;
+        })
+        .catch(() => {
+        });
     },
-    created() {
-      this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      // console.log(this.$store.getters["security/getUser"].id);
-  
+
+    getAllvideos() {
+      axios
+        .get("http://app.localhost/api/get-videos")
+        .then((res) => {
+
+          this.videos = res.data;
+
+          this.mainVideoPath = res.data[0].videoFilePath;
+
+        })
+        .catch(() => {
+        });
     },
-    mounted() {
-      this.getAllvideos();
-      this.getAllCategories();  
-    },
-    methods: {
-      changeVideoFilePath(path){
-        this.mainVideoPath = path;
-
-      },
-      check(event){
-        const spanText = event.target.querySelector("span").textContent;
-  
-      if(spanText == 'Categories'){
-
-        this.first_th = 'Category ID';
-        this.second_th = 'Category Name';
-  
-        this.first_td = 'id';
-        this.second_td = 'categoryName';
-  
-        this.entity_type = 'category';
-  
-        this.entities = 'categories';
-  
-      }else if(spanText == 'Videos'){
-  
-        this.first_th = 'Video Name';
-        this.second_th = 'Video Path';
-  
-        this.first_td = 'videoName';
-        this.second_td = 'videoFilePath';
-  
-        this.entity_type = 'video';
-  
-        this.entities = 'videos';
-  
-      }
-
-      this.getAllEntities();
-  
-      },
-    
-          getAllEntities(){
-            axios.get(`http://app.localhost/api/get-${this.entities}`)
-          .then((res) => {
-           this.list = res.data;
-          })
-          .catch(() => {
-          });
-          },
-  
-      getAllvideos() {
-        axios
-          .get("http://app.localhost/api/get-videos")
-          .then((res) => {
-
-            this.videos = res.data;
-
-            this.mainVideoPath = res.data[0].videoFilePath;
-
-          })
-          .catch(() => {
-          });
-      },
-      getAllCategories(){
-        axios
+    getAllCategories() {
+      axios
         .get("http://app.localhost/api/get-categories")
-          .then((res) => {
-  
-            this.categories = res.data;
-  
-          })
-          .catch(() => {
-          });
-      },
+        .then((res) => {
+
+          this.categories = res.data;
+          console.log(this.categories[0].videos[0].videoFilePath, 'this is the categories!')
+
+        })
+        .catch(() => {
+        });
     },
-  };
-  </script>
+  },
+};
+</script>

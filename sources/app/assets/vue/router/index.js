@@ -17,10 +17,8 @@ Vue.use(VueRouter);
 let router = new VueRouter({
   mode: "history",
   routes: [
-    { path: "/", component: VideoDisplay },
-
-    { path: "/dashboard", component: Dashboard },
-    { path: "/", component: VideoDisplay },
+    { path: "/", component: VideoDisplay,meta: { requiresAuth: true } },
+    { path: "/dashboard", component: Dashboard,meta: { requiresAuth: true } },
     { path: "/login", component: Login },
     { path: "/posts", component: Posts, meta: { requiresAuth: true } },
         {
@@ -48,7 +46,7 @@ let router = new VueRouter({
           component: CategoryPage,
           props: true          
         },
-    // { path: "*", redirect: "/home" }
+    { path: "*", redirect: "/" }
   ],
 });
 

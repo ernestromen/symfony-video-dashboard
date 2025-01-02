@@ -35,7 +35,7 @@ final class SecurityController extends AbstractController
         $user = $this->getUser();
         $userClone = clone $user;
         $userClone->setPassword('');
-        $data = $this->serializer->serialize($userClone, JsonEncoder::FORMAT);
+        $data = $this->serializer->serialize($userClone, JsonEncoder::FORMAT,['groups' => ['user:read']]);
 
         return new JsonResponse($data, Response::HTTP_OK, [], true);
     }

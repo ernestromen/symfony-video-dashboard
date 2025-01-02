@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @Rest\Route("/api")
@@ -72,11 +73,13 @@ final class PostController extends AbstractController
     /**
      * @Rest\Get("/get-videos", name="getVideo")
      */
-    public function getVideos(): JsonResponse
+    public function getVideos(Security $security): JsonResponse
     {
         try {
-            $videos = $this->em->getRepository(Video::class)->findAll();
-            $data = $this->serializer->serialize($videos, JsonEncoder::FORMAT);
+            $user = $security->getUser();
+            $filteredVideos = $this->em->getRepository(Video::class)->findByUserId($this->em, $user->getId()->toString());
+
+            $data = $this->serializer->serialize($filteredVideos, JsonEncoder::FORMAT);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 
@@ -134,6 +137,7 @@ final class PostController extends AbstractController
     {
         try {
             $categories = $this->em->getRepository(Category::class)->findAll();
+            // dd($categories[0]->getVideos()->toArray());
             $data = $this->serializer->serialize($categories, JsonEncoder::FORMAT);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
@@ -150,11 +154,11 @@ final class PostController extends AbstractController
     {
         try {
             $users = $this->em->getRepository(User::class)->findAll();
-            $data = $this->serializer->serialize($users, JsonEncoder::FORMAT);
+            $data = $this->serializer->serialize($users, JsonEncoder::FORMAT, ['groups' => ['user:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
     }
 
@@ -233,10 +237,6 @@ final class PostController extends AbstractController
         }
 
     }
-
-
-    //crud for categories
-
 
     /**
      * @Rest\Delete("/delete-category/{id}", name="deleteCategory")
@@ -376,5 +376,40 @@ final class PostController extends AbstractController
             echo new Response($e->getMessage(), 500);
         }
 
+    }
+    /**
+     * @Rest\Get("/test", name="test")
+     */
+    public function test(Security $security)
+    {
+        $user = $security->getUser();
+        dd($user->getId()->toString());
+        // dd($user->getCollectionRoles()[0]->getUsers()->toArray());
+
+        $videos = $this->em->getRepository(Video::class)->findAll();
+        // dd($videos[0]->getId());
+
+        // dd($videos[0]->getVideoRoles()->toArray());
+        // $category = $this->em->getRepository(Category::class)->findOneBy([]);
+
+        $categories = $this->em->getRepository(Category::class)->findAll();
+
+        foreach ($categories as $category) {
+
+            // Fetch the collection of videos
+            $videos = $category->getVideos();
+
+            // Iterate over each video in the collection
+            foreach ($videos as $video) {
+                // Access the getId() method on the Video entity
+                // dd($video->getCategoryId());
+                if ($video->getCategoryId() === 27) {
+                    var_dump($video->getId());
+
+                }
+            }
+        }
+        die();
+        // dd($category->getVideos()->toArray());
     }
 }

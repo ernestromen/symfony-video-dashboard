@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -45,6 +46,15 @@ class Video
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\VideoRole", mappedBy="video")
+     */
+    private $videoRoles;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
     private $created_at;
 
     /**
@@ -73,6 +83,11 @@ class Video
         $this->user_id = $user_id;
 
         return $this;
+    }
+
+    public function getCategoryId(): ?int
+    {
+        return $this->category_id;
     }
 
     public function setCategory(?Category $category): self
@@ -105,5 +120,13 @@ class Video
 
         return $this;
     }
-    
+    /**
+     * @return Collection
+     * 
+     */
+    public function getVideoRoles(): Collection
+    {
+        return $this->videoRoles;
+    }
+
 }
