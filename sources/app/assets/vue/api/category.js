@@ -7,7 +7,6 @@ export default {
     });
   },
   findAll() {
-    console.log('from findall!');
     return axios.get("/api/get-categories");
   }
 };

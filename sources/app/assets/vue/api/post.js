@@ -7,7 +7,6 @@ export default {
     });
   },
   findAll() {
-    console.log('findall posts');
     return axios.get("/api/posts");
   }
 };

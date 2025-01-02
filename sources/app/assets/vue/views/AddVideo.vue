@@ -39,10 +39,10 @@
         </option>
       </select>
     </div>
-    <!-- <div class="form-group">
+    <div class="form-group">
       <select
         class="form-control custom-select"
-        name="categoryId" 
+        name="roleId" 
       >
         <option
           value=""
@@ -52,14 +52,14 @@
           Select an option
         </option>
         <option
-          v-for="user in users"
-          :key="user.id"
-          :value="user.roles[0]"
+          v-for="role in roles"
+          :key="role.id"
+          :value="role.id"
         >
-          {{ user.roles[0] }}
+          {{ role.name }}
         </option>
       </select>
-    </div> -->
+    </div>
     <button
       type="submit"
       class="btn btn-primary btn-block mb-5 "
@@ -76,7 +76,8 @@ export default {
   data: function () {
     return {
       csrfToken: '',
-      users: []
+      users: [],
+      roles:[]
     };
   },
   computed: {
@@ -92,21 +93,25 @@ export default {
 
   },
   mounted() {
-this.getAllUsers();
+this.getAllRoles();
   },
   methods: {
 
     handleSubmit(e) {
-
+// console.log('this.csrfToken:',this.csrfToken)
       let FileResult = e.target.querySelector('input[type="file"]').files[0];
       let categoryId = e.target.querySelector('select[name="categoryId"]').value;
+      let roleId = e.target.querySelector('select[name="roleId"]').value;
 
       const formData = new FormData();
       
       formData.append('userId', this.$store.getters["security/getUser"].id);
       formData.append('categoryId',categoryId );
+      formData.append('roleId',roleId );
+
 
       formData.append('video', FileResult,'file');
+      formData.append('csrfToken',this.csrfToken);
 
       axios
         .post('http://app.localhost/api/upload-video',formData
@@ -119,11 +124,12 @@ this.getAllUsers();
           console.log(error, 'this is my error');
         });
     },
-    getAllUsers(){
-      axios.get('http://app.localhost/api/get-users')
+    getAllRoles(){
+      axios.get('http://app.localhost/api/get-all-roles')
         .then((res) => {
-         console.log(res.data[0].roles[0]);
-         this.users =res.data; 
+          
+         console.log(res.data,'roles!');
+         this.roles =res.data; 
         })
         .catch(() => {
         });

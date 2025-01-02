@@ -24,7 +24,7 @@ final class Version20241119175853 extends AbstractMigration
 
         $this->addSql('CREATE TABLE categories (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
         $this->addSql('CREATE TABLE videos (id INT AUTO_INCREMENT NOT NULL, category_id INT DEFAULT NULL, user_id VARCHAR(255) DEFAULT NULL, video_name VARCHAR(255) NOT NULL, video_file_path VARCHAR(255) DEFAULT NULL, created_at DATETIME DEFAULT NULL, updated_at DATETIME DEFAULT NULL, INDEX IDX_7CC7DA2C12469DE2 (category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE videos ADD CONSTRAINT FK_7CC7DA2C12469DE2 FOREIGN KEY (category_id) REFERENCES categories (id)');
+        // $this->addSql('ALTER TABLE videos ADD CONSTRAINT FK_7CC7DA2C12469DE2 FOREIGN KEY (category_id) REFERENCES categories (id)');
     }
 
     public function down(Schema $schema) : void
@@ -32,8 +32,8 @@ final class Version20241119175853 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE videos DROP FOREIGN KEY FK_7CC7DA2C12469DE2');
-        $this->addSql('DROP TABLE categories');
+        // $this->addSql('ALTER TABLE videos DROP FOREIGN KEY FK_7CC7DA2C12469DE2');
         $this->addSql('DROP TABLE videos');
+        $this->addSql('DROP TABLE categories');
     }
 }

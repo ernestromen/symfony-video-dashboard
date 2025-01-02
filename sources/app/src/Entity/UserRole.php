@@ -29,4 +29,24 @@ class UserRole
      * @ORM\JoinColumn(nullable=false)
      */
     private $role;
+
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setRole(Role $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function getRole()
+    {
+        return $this->role;
+    }
 }

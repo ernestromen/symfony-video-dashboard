@@ -31,6 +31,12 @@
               Login
             </button>
           </div>
+          <div class="pl-2">
+            <a
+              class=""
+              href="/register"
+            >Register here!</a>
+          </div>
         </div>
       </form>
     </div>

@@ -204,7 +204,7 @@ export default {
       }
     },
     check(event){
-      console.log(event.target,'event.target');
+
       const spanText = event.target.querySelector("span").textContent;
       // active_nav
 
@@ -220,12 +220,12 @@ export default {
       this.entities = 'categories';
 
     }else if(spanText == 'Videos'){
-console.log('here');
+
       this.first_th = 'Video Name';
       this.second_th = 'Category ID';
 
-      this.first_td = 'videoName';
-      this.second_td = 'categoryId';
+      this.first_td = 'video_name';
+      this.second_td = 'category_id';
 
       this.entity_type = 'video';
 
@@ -262,7 +262,6 @@ console.log('here');
      
       )
         .then((res) => {
-          console.log(res.data, 'res is here2');
           this.videos.push({'videoName':res.data,'videoFilePath':res.data})
         })
         .catch((error) => {
@@ -303,6 +302,7 @@ console.log(res);
           axios.get(`http://app.localhost/api/get-${this.entities}`)
         .then((res) => {
          this.list = res.data;
+         console.log(res.data);
         })
         .catch(() => {
         });

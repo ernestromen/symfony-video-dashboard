@@ -64,8 +64,6 @@
                   .then((res) => {
                       console.log(res.data, 'res is here2');
                       // this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
-  
-                      // console.log(this.videos);
                   })
                   .catch((error) => {
                       console.log(error, 'this is my error');

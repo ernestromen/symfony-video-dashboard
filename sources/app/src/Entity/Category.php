@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -14,6 +14,7 @@ class Category
     
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Video", mappedBy="category")
+     * @Groups({"category:read"})
      */
     private $videos;
 
@@ -21,11 +22,13 @@ class Category
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"category:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"category:read"})
      */
     private $name;
 

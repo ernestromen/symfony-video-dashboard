@@ -7,6 +7,8 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Event\UserRegisteredEvent;
 
 final class UserFixtures extends Fixture
 {
@@ -34,28 +36,41 @@ final class UserFixtures extends Fixture
 
     public const ADVANCED_STUDENT_PASSWORD = 'user';
 
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
+    public function __construct(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+    public function getDependencies()
+    {
+        return array('App\DataFixtures\RoleFixtures'); // fixture classes fixture is dependent on
+    }
     public function load(ObjectManager $manager): void
     {
-        $this->createUser($manager, self::ADMIN_USER, self::ADMIN_USER_PASSWORD, ['ROLE_ADMIN']);
-        $this->createUser($manager, self::DEFAULT_USER_LOGIN, self::DEFAULT_USER_PASSWORD, ['ROLE_FOO']);
-        $this->createUser($manager, self::USER_LOGIN_ROLE_BAR, self::USER_PASSWORD_ROLE_BAR, ['ROLE_BAR']);
-        $this->createUser($manager, self::BEGINNER_STUDENT_USER, self::BEGINNER_STUDENT_PASSWORD, ['ROLE_BEGINNER']);
-        $this->createUser($manager, self::INTERMEDIATE_STUDENT_USER, self::INTERMEDIATE_STUDENT_PASSWORD, ['ROLE_INTERMEDIATE']);
-        $this->createUser($manager, self::ADVANCED_STUDENT_USER, self::ADVANCED_STUDENT_PASSWORD, ['ROLE_ADVANCED']);
-
+        $this->createUser($manager, self::ADMIN_USER, self::ADMIN_USER_PASSWORD);
+        $this->createUser($manager, self::DEFAULT_USER_LOGIN, self::DEFAULT_USER_PASSWORD);
+        $this->createUser($manager, self::USER_LOGIN_ROLE_BAR, self::USER_PASSWORD_ROLE_BAR);
+        $this->createUser($manager, self::BEGINNER_STUDENT_USER, self::BEGINNER_STUDENT_PASSWORD);
+        $this->createUser($manager, self::INTERMEDIATE_STUDENT_USER, self::INTERMEDIATE_STUDENT_PASSWORD);
+        $this->createUser($manager, self::ADVANCED_STUDENT_USER, self::ADVANCED_STUDENT_PASSWORD);
     }
 
     /**
      * @param string[] $roles
      */
-    private function createUser(ObjectManager $manager, string $login, string $password, array $roles): void
+    private function createUser(ObjectManager $manager, string $login, string $password): void
     {
         $userEntity = new User();
         $userEntity->setLogin($login);
         $userEntity->setPlainPassword($password);
-        $userEntity->setRoles($roles);
         $manager->persist($userEntity);
+        $userEntityId = $userEntity->getId();
+
+        $event = new UserRegisteredEvent($userEntity);
+        $this->dispatcher->dispatch($event,UserRegisteredEvent::NAME);
+
         $manager->flush();
     }
 }

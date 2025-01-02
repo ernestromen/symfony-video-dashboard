@@ -28,7 +28,6 @@ export default {
       return state.posts.length > 0;
     },
     posts(state) {
-      console.log('state.posts');
       return state.posts;
     }
   },
@@ -76,7 +75,6 @@ export default {
       }
     },
     async findAll({ commit }) {
-      console.log('findall before')
       commit(FETCHING_POSTS);
       try {
         let response = await PostAPI.findAll();

@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store";
 import Login from "../views/Login";
+import Register from "../views/Register";
 import Posts from "../views/Posts";
 import Dashboard from "../views/Dashboard";
 import Editvideo from "../views/Edit_video";
@@ -20,6 +21,7 @@ let router = new VueRouter({
     { path: "/", component: VideoDisplay,meta: { requiresAuth: true } },
     { path: "/dashboard", component: Dashboard,meta: { requiresAuth: true } },
     { path: "/login", component: Login },
+    { path: "/register", component: Register },
     { path: "/posts", component: Posts, meta: { requiresAuth: true } },
         {
           path: "/edit-video/:id",
@@ -54,7 +56,9 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
+
     if (store.getters["security/isAuthenticated"]) {
+      // to.fullPath == '/dashboard' &&  store.getters["security/getUser"].login !== 'admin' ? next({path: "/",query: { redirect: to.fullPath }}) : '';
       next();
     } else {
       next({

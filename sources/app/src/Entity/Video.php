@@ -3,9 +3,10 @@
 namespace App\Entity;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VideoRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -20,6 +21,7 @@ class Video
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"category:read"})
      */
     private $id;
 
@@ -30,16 +32,20 @@ class Video
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"category:read"})
+
      */
     private $category_id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"category:read"})
      */
     private $video_name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"category:read"})
      */
     private $video_file_path;
 
@@ -67,6 +73,20 @@ class Video
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $updated_at;
+
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="videos")
+     * @ORM\JoinTable(name="video_role")
+     */
+
+    private $roles;
+
+    public function __construct()
+    {
+        $this->videoRoles = new ArrayCollection();
+        $this->roles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -127,6 +147,22 @@ class Video
     public function getVideoRoles(): Collection
     {
         return $this->videoRoles;
+    }
+
+
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function addRole(Role $role): self
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+
+        }
+
+        return $this;
     }
 
 }

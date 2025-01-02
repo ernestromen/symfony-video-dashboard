@@ -166,7 +166,6 @@ class User implements UserInterface
 
     /**
      * @return Collection|Role[]
-     * @Groups({"user:read"})
      */
     public function getCollectionRoles()
     {

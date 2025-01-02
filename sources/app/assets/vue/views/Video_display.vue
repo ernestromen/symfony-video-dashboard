@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <nav class="sidebar">
+    <nav
+      class="sidebar"
+      style="overflow-y: scroll;"
+    >
       <ul>
         <li class="px-0">
           <div class="pos-f-t">
@@ -38,9 +41,9 @@
 
                 <div
                   class="border pl-3 py-2"
-                  @click="changeVideoFilePath(video.videoFilePath)"
+                  @click="changeVideoFilePath(video.video_file_path)"
                 >
-                  {{ video.videoFilePath }}
+                  {{ video.video_file_path }}
                 </div>
 
                 <!-- end here -->
@@ -111,7 +114,7 @@
                     class="collapse"
                   >
                     <div
-                      v-for="categoryVideo in category.videos"
+                      v-for="(categoryVideo, index) in category.videos"
                       
                       :id="`navbarToggleExternalContent${category.id}`"
                       :key="categoryVideo.id"
@@ -119,9 +122,10 @@
                     >
                       <div
                         class="border pl-3 py-2"
-                        @click="changeVideoFilePath(categoryVideo.videoFilePath)"
+                        :class="{'mb-4': index === category.videos.length - 1}"
+                        @click="changeVideoFilePath(categoryVideo.video_file_path)"
                       >
-                        {{ categoryVideo.videoFilePath }}
+                        {{ categoryVideo.video_file_path }}
                       </div>
                     </div>
                   </div>
@@ -190,7 +194,6 @@ export default {
       categories: [],
       users: [],
       list: [],
-      entities: 'users',
       videoFile: null,
       inputData: '',
       mainVideoPath: '',
@@ -215,16 +218,6 @@ export default {
 
     },
 
-
-    getAllEntities() {
-      axios.get(`http://app.localhost/api/get-${this.entities}`)
-        .then((res) => {
-          this.list = res.data;
-        })
-        .catch(() => {
-        });
-    },
-
     getAllvideos() {
       axios
         .get("http://app.localhost/api/get-videos")
@@ -232,19 +225,20 @@ export default {
 
           this.videos = res.data;
 
-          this.mainVideoPath = res.data[0].videoFilePath;
+          this.mainVideoPath = res.data[0].video_file_path;
+          this.mainVideoPath2 = res.data[0].video_file_path;
 
         })
         .catch(() => {
         });
     },
+
     getAllCategories() {
       axios
         .get("http://app.localhost/api/get-categories")
         .then((res) => {
 
           this.categories = res.data;
-          console.log(this.categories[0].videos[0].videoFilePath, 'this is the categories!')
 
         })
         .catch(() => {

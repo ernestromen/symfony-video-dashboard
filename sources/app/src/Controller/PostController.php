@@ -7,7 +7,7 @@ use App\Entity\Video;
 use App\Entity\Post;
 use App\Entity\Category;
 use App\Entity\User;
-
+use App\Entity\Role;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @Rest\Route("/api")
@@ -26,16 +27,20 @@ use Symfony\Component\Security\Core\Security;
  */
 final class PostController extends AbstractController
 {
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
+
     /** @var EntityManagerInterface */
     private $em;
 
     /** @var SerializerInterface */
     private $serializer;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer,EventDispatcherInterface $dispatcher)
     {
         $this->em = $em;
         $this->serializer = $serializer;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -76,10 +81,10 @@ final class PostController extends AbstractController
     public function getVideos(Security $security): JsonResponse
     {
         try {
+
             $user = $security->getUser();
             $filteredVideos = $this->em->getRepository(Video::class)->findByUserId($this->em, $user->getId()->toString());
-
-            $data = $this->serializer->serialize($filteredVideos, JsonEncoder::FORMAT);
+            $data = $this->serializer->serialize($filteredVideos, JsonEncoder::FORMAT,['groups' => ['category:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 
@@ -96,13 +101,17 @@ final class PostController extends AbstractController
 
         $userId = $request->request->get('userId');
         $categoryId = $request->request->get('categoryId');
+        $roleId = $request->request->get('roleId');
+
         $video = new Video();
 
         try {
             $category = $this->em->getRepository(Category::class)->find($categoryId);
+            $role = $this->em->getRepository(Role::class)->find($roleId);
 
             $video->setUserId($userId);
             $video->setCategory($category);
+            $video->addRole($role);
 
             $videoFile = $request->files->get('video');
 
@@ -118,7 +127,7 @@ final class PostController extends AbstractController
                 $video->setVideoFilePath($newFilename);
                 $video->setVideoName($newFilename);
 
-                // dd($video);
+
                 $this->em->persist($video);
                 $this->em->flush();
             }
@@ -135,10 +144,33 @@ final class PostController extends AbstractController
      */
     public function getCategories()
     {
+        // $categories = $this->em->getRepository(Category::class)->findAll();
+        $currentLoggedInUserId = $this->getUser()->getId();
+
+        // Query to fetch categories with their associated filtered videos
+        $query = $this->em->createQuery(
+            'SELECT c, v
+     FROM App\Entity\Category c
+     LEFT JOIN c.videos v
+     LEFT JOIN v.videoRoles vr
+     LEFT JOIN vr.role r
+     LEFT JOIN App\Entity\UserRole ur
+     WITH ur.user = :userId
+     AND ur.role = r.id
+     AND v.category = c
+     ORDER BY c.id, v.id'
+        );
+
+        // Set the parameter for the logged-in user
+        $query->setParameter('userId', $currentLoggedInUserId);
+
+        // Execute the query to get the results
+        $categoriesWithFilteredVideos = $query->getResult();
+
         try {
             $categories = $this->em->getRepository(Category::class)->findAll();
-            // dd($categories[0]->getVideos()->toArray());
-            $data = $this->serializer->serialize($categories, JsonEncoder::FORMAT);
+// dd($categoriesWithFilteredVideos[1]->getVideos()->toArray()[0]->getRoles()->toArray());
+            $data = $this->serializer->serialize($categoriesWithFilteredVideos, JsonEncoder::FORMAT,['groups' => ['category:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
@@ -160,6 +192,22 @@ final class PostController extends AbstractController
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
         }
+    }
+
+    /**
+     * @Rest\Get("/get-all-roles", name="getAllRoles")
+     */
+    public function getAllRoles()
+    {
+     
+        try {
+            $roles = $this->em->getRepository(Role::class)->findAll();
+            $data = $this->serializer->serialize($roles, JsonEncoder::FORMAT,['groups' => ['role:read']]);
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
+
     }
 
     /**
@@ -191,7 +239,6 @@ final class PostController extends AbstractController
 
     }
 
-
     /**
      * @Rest\Get("/edit-video/{id}", name="editVideo")
      */
@@ -208,7 +255,6 @@ final class PostController extends AbstractController
         } catch (\Exception $e) {
             echo new Response($e->getMessage(), 500);
         }
-
     }
 
     /**
@@ -216,14 +262,19 @@ final class PostController extends AbstractController
      */
     public function updateVideo($id, Request $request)
     {
+
         try {
+
             $videoToUpdate = $this->em->getRepository(Video::class)->find($id);
+            $categoryId = $request->request->get('categoryId');
+            $cateogryToUpdateToVideo = $this->em->getRepository(Category::class)->find($categoryId);
 
             if (!$videoToUpdate) {
                 throw $this->createNotFoundException('Video not found.');
             }
 
             $videoToUpdate->setVideoFilePath($request->request->get('videoFilePath'));
+            $videoToUpdate->setCategory($cateogryToUpdateToVideo);
 
             $this->em->persist($videoToUpdate);
             $this->em->flush();
@@ -345,7 +396,7 @@ final class PostController extends AbstractController
             }
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
 
     }
@@ -377,39 +428,22 @@ final class PostController extends AbstractController
         }
 
     }
+
+    /**
+     * 
+     *
+     * @Rest\Post("/register", name="register")
+     */
+    public function register(Request $request): void
+    {
+        dd($request);
+    }
     /**
      * @Rest\Get("/test", name="test")
      */
     public function test(Security $security)
     {
+        //testing route
         $user = $security->getUser();
-        dd($user->getId()->toString());
-        // dd($user->getCollectionRoles()[0]->getUsers()->toArray());
-
-        $videos = $this->em->getRepository(Video::class)->findAll();
-        // dd($videos[0]->getId());
-
-        // dd($videos[0]->getVideoRoles()->toArray());
-        // $category = $this->em->getRepository(Category::class)->findOneBy([]);
-
-        $categories = $this->em->getRepository(Category::class)->findAll();
-
-        foreach ($categories as $category) {
-
-            // Fetch the collection of videos
-            $videos = $category->getVideos();
-
-            // Iterate over each video in the collection
-            foreach ($videos as $video) {
-                // Access the getId() method on the Video entity
-                // dd($video->getCategoryId());
-                if ($video->getCategoryId() === 27) {
-                    var_dump($video->getId());
-
-                }
-            }
-        }
-        die();
-        // dd($category->getVideos()->toArray());
     }
 }

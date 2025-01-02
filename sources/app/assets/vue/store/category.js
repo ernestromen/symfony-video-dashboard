@@ -28,7 +28,6 @@ export default {
       return state.categories.length > 0;
     },
     categories(state) {
-      console.log(state.categories,'state.categories');
       return state.categories;
     }
   },
@@ -68,7 +67,6 @@ export default {
       commit(CREATING_CATEGORY);
       try {
         let response = await CategoryAPI.create(message);
-        console.log('response in try',response);
         commit(CREATING_CATEGORY_SUCCESS, response.data);
         return response.data;
       } catch (error) {

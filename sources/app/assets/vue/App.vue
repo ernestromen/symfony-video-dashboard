@@ -32,6 +32,8 @@
             <a class="nav-link">Posts</a>
           </router-link>
           <router-link
+            v-if="currentUser !== null && currentUser.login === 'admin'"
+
             class="nav-item"
             tag="li"
             to="/dashboard"
@@ -67,10 +69,16 @@ export default {
     },
     getState(){
       return this.$store.getters["security/getState"]
+    },
+    currentUser(){
+      return this.$store.getters["security/getUser"];
     }
   },
+
+  mounted(){
+  },
   created() {
-    
+
     let isAuthenticated = JSON.parse(this.$parent.$el.attributes["data-is-authenticated"].value),
       user = JSON.parse(this.$parent.$el.attributes["data-user"].value);
     let payload = { isAuthenticated: isAuthenticated, user: user };
@@ -80,8 +88,6 @@ export default {
       return new Promise(() => {
         if (err.response.status === 401) {
           this.$router.push({path: "/login"})
-          console.log(user,'this is the user');
-
         } else if (err.response.status === 500) {
           document.open();
           document.write(err.response.data);

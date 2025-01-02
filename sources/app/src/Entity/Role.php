@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RoleRepository")
+ * @ORM\Table(name="roles")
  */
 class Role
 {
@@ -18,6 +19,7 @@ class Role
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"role:read"})
      */
     private $id;
 
@@ -28,12 +30,13 @@ class Role
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"role:read"})
+
      */
     private $name;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="roles")
-     * @Groups({"role:read"})
      */
     private $users;
 
@@ -54,9 +57,13 @@ class Role
         return $this->name;
     }
 
+    public function setName($name): void
+    {
+        $this->name = $name;
+    }
+
     /**
      * @return Collection|User[]
-     * @Groups({"role:read"})
      */
     public function getUsers(): Collection
     {

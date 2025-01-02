@@ -30,17 +30,21 @@ final class IndexController extends AbstractController
      */
     public function indexAction(): Response
     {
+        
+        // $token = $this->container->get('security.token_storage')->getToken();
+        // dd($token);
         /** @var User|null $user */
         $user = $this->getUser();
         $data = null;
-        if (! empty($user)) {
+        // dd($user);
+        if (!empty($user)) {
             $userClone = clone $user;
             $userClone->setPassword('');
-            $data = $this->serializer->serialize($userClone, JsonEncoder::FORMAT,['groups' => ['user:read']]);
+            $data = $this->serializer->serialize($userClone, JsonEncoder::FORMAT, ['groups' => ['user:read']]);
         }
 
         return $this->render('base.html.twig', [
-            'isAuthenticated' => json_encode(! empty($user)),
+            'isAuthenticated' => json_encode(!empty($user)),
             'user' => $data ?? json_encode($data),
         ]);
     }
