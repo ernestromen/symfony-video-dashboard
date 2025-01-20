@@ -17,6 +17,8 @@ final class RoleFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $connection = $manager->getConnection();
+        $connection->executeQuery('TRUNCATE TABLE roles');
         $this->createRole($manager, self::ROLE_ADMIN);
         $this->createRole($manager, self::ROLE_BEGINNER);
         $this->createRole($manager, self::ROLE_INTERMEDIATE);

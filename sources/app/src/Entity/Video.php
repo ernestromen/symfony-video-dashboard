@@ -38,7 +38,7 @@ class Video
     private $category_id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"category:read"})
      */
     private $video_name;
@@ -54,7 +54,7 @@ class Video
      */
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\VideoRole", mappedBy="video")
+     * @ORM\OneToMany(targetEntity="App\Entity\VideoRole", mappedBy="video", cascade={"persist"})
      */
     private $videoRoles;
 
@@ -122,7 +122,7 @@ class Video
         return $this->video_name;
     }
 
-    public function setVideoName(string $video_name): self
+    public function setVideoName(?string $video_name): self
     {
         $this->video_name = $video_name;
 

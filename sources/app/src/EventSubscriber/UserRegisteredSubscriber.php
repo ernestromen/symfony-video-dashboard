@@ -45,7 +45,7 @@ class UserRegisteredSubscriber implements EventSubscriberInterface
             } else if ($userLoginName == 'foo'
              || $userLoginName == 'beginner student')
             {
-                $role = $this->em->getRepository(Role::class)->find(2);
+                $role = $this->em->getRepository(Role::class)->findById(2);
                 $userRole = new UserRole();
                 $userRole->setUser($event->getUser());
                 $userRole->setRole($role);
@@ -53,7 +53,7 @@ class UserRegisteredSubscriber implements EventSubscriberInterface
                 $this->em->flush();
             } else if ($userLoginName == 'intermediate student'
              || $userLoginName == 'bar') {
-                $role = $this->em->getRepository(Role::class)->find(3);
+                $role = $this->em->getRepository(Role::class)->findById(3);
                 $userRole = new UserRole();
                 $userRole->setUser($event->getUser());
                 $userRole->setRole($role);
@@ -61,7 +61,7 @@ class UserRegisteredSubscriber implements EventSubscriberInterface
                 $this->em->flush();
                 
             } else if ($userLoginName == 'advanced student') {
-                $role = $this->em->getRepository(Role::class)->find(4);
+                $role = $this->em->getRepository(Role::class)->findById(4);
                 $userRole = new UserRole();
                 $userRole->setUser($event->getUser());
                 $userRole->setRole($role);

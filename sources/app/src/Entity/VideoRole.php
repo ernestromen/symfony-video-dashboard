@@ -29,4 +29,14 @@ class VideoRole
     private $role;
 
     // Getters and Setters
+
+    public function setVideo(Video $video): void
+    {
+        $this->video = $video;
+    }
+
+    public function setRole(Role $role): void
+    {
+        $this->role = $role;
+    }
 }

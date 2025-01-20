@@ -444,6 +444,5 @@ final class PostController extends AbstractController
     public function test(Security $security)
     {
         //testing route
-        $user = $security->getUser();
     }
 }

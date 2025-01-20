@@ -18,6 +18,8 @@ final class CategoryFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $connection = $manager->getConnection();
+        $connection->executeQuery('TRUNCATE TABLE categories');
         $this->createCategory($manager, self::DEFAULT_FIRST_CATEGORY);
         $this->createCategory($manager, self::DEFAULT_SECOND_CATEGORY);
         $this->createCategory($manager, self::DEFAULT_THIRD_CATEGORY);

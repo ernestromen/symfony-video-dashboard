@@ -209,7 +209,7 @@ export default {
 
   },
   mounted() {
-    this.getAllvideos();
+    this.getAllVideos();
     this.getAllCategories();
   },
   methods: {
@@ -218,7 +218,7 @@ export default {
 
     },
 
-    getAllvideos() {
+    getAllVideos() {
       axios
         .get("http://app.localhost/api/get-videos")
         .then((res) => {
