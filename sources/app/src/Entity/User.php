@@ -35,7 +35,7 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserRole", mappedBy="user", cascade={"persist"})
      */
     private $userRoles;
 
@@ -87,6 +87,7 @@ class User implements UserInterface
     public function __construct()
     {
         $this->roles = new ArrayCollection();
+        $this->userRoles = new ArrayCollection();
     }
 
     /**
@@ -167,9 +168,18 @@ class User implements UserInterface
     /**
      * @return Collection|Role[]
      */
-    public function getCollectionRoles()
+    public function getCollectionRoles(): Collection
     {
         return $this->roles;
+    }
+
+    /**
+     * @return Collection   
+     * 
+     */
+    public function getUserRoles(): Collection
+    {
+        return $this->userRoles;
     }
 
     /**

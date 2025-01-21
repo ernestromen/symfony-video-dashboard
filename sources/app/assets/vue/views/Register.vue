@@ -1,41 +1,37 @@
 <template>
   <div>
     <div class="row col">
-      <h1>Login</h1>
+      <h1 class="m-auto pt-3">
+        Register
+      </h1>
     </div>
   
-    <div class="row col">
+    <div class="row col justify-content-center">
       <form>
         <div class="form-row">
-          <div class="col-4">
+          <div class="col-12 mt-3">
             <input
               v-model="login"
               type="text"
               class="form-control"
             >
           </div>
-          <div class="col-4">
+          <div class="col-12 mt-3">
             <input
               v-model="password"
               type="password"
               class="form-control"
             >
           </div>
-          <div class="col-4">
+          <div class="col-12 mt-3">
             <button
               :disabled="login.length === 0 || password.length === 0 || isLoading"
               type="button"
-              class="btn btn-primary"
-              @click="performLogin()"
+              class="btn btn-primary w-100"
+              @click="performRegister()"
             >
-              Login
+              Register
             </button>
-          </div>
-          <div class="pl-2">
-            <a
-              class=""
-              href="/register"
-            >Register here!</a>
           </div>
         </div>
       </form>
@@ -61,7 +57,7 @@
   import ErrorMessage from "../components/ErrorMessage";
   
   export default {
-    name: "Login",
+    name: "Register",
     components: {
       ErrorMessage,
     },
@@ -98,18 +94,18 @@
       }
     },
     methods: {
-      async performLogin() {
-        let payload = {login: this.$data.login, password: this.$data.password},
-          redirect = this.$route.query.redirect;
+      async performRegister() {
+        let payload = {login: this.$data.login, password: this.$data.password};
+          // redirect = this.$route.query.redirect;
   
-        await this.$store.dispatch("security/login", payload);
-        if (!this.$store.getters["security/hasError"]) {
-          if (typeof redirect !== "undefined") {
-            this.$router.push({path: redirect});
-          } else {
-            this.$router.push({path: "/"});
-          }
-        }
+        await this.$store.dispatch("security/register", payload);
+        // if (!this.$store.getters["security/hasError"]) {
+        //   if (typeof redirect !== "undefined") {
+        //     this.$router.push({path: redirect});
+        //   } else {
+        //     this.$router.push({path: "/"});
+        //   }
+        // }
       }
     }
   }

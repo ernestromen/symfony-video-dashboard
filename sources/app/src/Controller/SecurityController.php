@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Role;
+use App\Entity\UserRole;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/api")
@@ -21,9 +25,13 @@ final class SecurityController extends AbstractController
     /** @var SerializerInterface */
     private $serializer;
 
-    public function __construct(SerializerInterface $serializer)
+    /** @var EntityManagerInterface */
+    private $em;
+
+    public function __construct(SerializerInterface $serializer, EntityManagerInterface $em)
     {
         $this->serializer = $serializer;
+        $this->em = $em;
     }
 
     /**
@@ -48,5 +56,35 @@ final class SecurityController extends AbstractController
     public function logoutAction(): void
     {
         throw new RuntimeException('This should not be reached!');
+    }
+
+    /**
+     * @throws RuntimeException
+     *
+     * @Route("/security/register", name="register", methods={"POST"})
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $login = $request->request->get('login');
+        $password = $request->request->get('password');
+
+        $newUser = new User();
+        $newUser->setLogin($login);
+        $newUser->setPlainPassword($password);
+
+        $role = $this->em->getRepository(Role::class)->find(2);
+
+        $userRole = new UserRole();
+        $userRole->setUser($newUser);
+        $userRole->setRole($role);
+
+        $newUser->getUserRoles()->add($userRole);
+
+        $this->em->persist($newUser);
+        $this->em->flush();
+
+        $data = $this->serializer->serialize(["message" => "hello from 2000 years in the future"], JsonEncoder::FORMAT);
+
+        return new JsonResponse($data, Response::HTTP_OK, [], true);
     }
 }
