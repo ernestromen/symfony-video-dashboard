@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -36,12 +38,12 @@ class Category
     {
         $this->videos = new \Doctrine\Common\Collections\ArrayCollection();
     }
-        /**
+    /**
      * Returns all videos associated with this category.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVideos()
+    public function getVideos(): Collection
     {
         return $this->videos;
     }
@@ -59,6 +61,12 @@ class Category
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+    public function setVideos(Collection $videos): self
+    {
+        $this->videos = $videos;
 
         return $this;
     }
