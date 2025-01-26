@@ -20,6 +20,9 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 /**
  * @Rest\Route("/api")
@@ -36,7 +39,7 @@ final class PostController extends AbstractController
     /** @var SerializerInterface */
     private $serializer;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer,EventDispatcherInterface $dispatcher)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, EventDispatcherInterface $dispatcher)
     {
         $this->em = $em;
         $this->serializer = $serializer;
@@ -84,7 +87,7 @@ final class PostController extends AbstractController
 
             $user = $security->getUser();
             $filteredVideos = $this->em->getRepository(Video::class)->findByUserId($this->em, $user->getId()->toString());
-            $data = $this->serializer->serialize($filteredVideos, JsonEncoder::FORMAT,['groups' => ['category:read']]);
+            $data = $this->serializer->serialize($filteredVideos, JsonEncoder::FORMAT, ['groups' => ['category:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 
@@ -151,26 +154,43 @@ final class PostController extends AbstractController
         $query = $this->em->createQuery(
             'SELECT c, v
      FROM App\Entity\Category c
-     LEFT JOIN c.videos v
-     LEFT JOIN v.videoRoles vr
-     LEFT JOIN vr.role r
-     LEFT JOIN App\Entity\UserRole ur
-     WITH ur.user = :userId
+     JOIN c.videos v
+     JOIN v.videoRoles vr
+     JOIN vr.role r
+     JOIN App\Entity\UserRole ur
+     WHERE ur.user = :userId
      AND ur.role = r.id
      AND v.category = c
      ORDER BY c.id, v.id'
         );
 
-        // Set the parameter for the logged-in user
         $query->setParameter('userId', $currentLoggedInUserId);
 
-        // Execute the query to get the results
         $categoriesWithFilteredVideos = $query->getResult();
+
+        $categoriesWithFilteredVideosCollection = new ArrayCollection($categoriesWithFilteredVideos);
+
+        $categories = $this->em->getRepository(Category::class)->findAll();
+
+        foreach ($categories as $category) {
+            foreach ($categoriesWithFilteredVideos as $filteredCategory) {
+                if (!$categoriesWithFilteredVideosCollection->contains($category)) {
+                    $category->setVideos(new ArrayCollection());
+                }
+
+                if ($category->getName() === $filteredCategory->getName()) {
+                    $category->setVideos($filteredCategory->getVideos());
+                    break;
+                }
+            }
+
+        }
+
+        $categoriesWithFilteredVideos = $categories;
 
         try {
             $categories = $this->em->getRepository(Category::class)->findAll();
-// dd($categoriesWithFilteredVideos[1]->getVideos()->toArray()[0]->getRoles()->toArray());
-            $data = $this->serializer->serialize($categoriesWithFilteredVideos, JsonEncoder::FORMAT,['groups' => ['category:read']]);
+            $data = $this->serializer->serialize($categoriesWithFilteredVideos, JsonEncoder::FORMAT, ['groups' => ['category:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
@@ -199,10 +219,10 @@ final class PostController extends AbstractController
      */
     public function getAllRoles()
     {
-     
+
         try {
             $roles = $this->em->getRepository(Role::class)->findAll();
-            $data = $this->serializer->serialize($roles, JsonEncoder::FORMAT,['groups' => ['role:read']]);
+            $data = $this->serializer->serialize($roles, JsonEncoder::FORMAT, ['groups' => ['role:read']]);
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
@@ -228,7 +248,7 @@ final class PostController extends AbstractController
                 throw $this->createNotFoundException('Video not found.');
             }
 
-            $this->em->remove($videoToDelete);
+            $this->em->remove(/*  */ $videoToDelete);
 
             $this->em->flush();
 

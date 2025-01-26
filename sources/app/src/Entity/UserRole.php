@@ -4,12 +4,16 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\TimestampableTrait;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRoleRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class UserRole
 {
+    use TimestampableTrait;
+
     // Properties and associations
     /**
      * @ORM\Id()

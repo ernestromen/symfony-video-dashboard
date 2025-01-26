@@ -7,14 +7,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\Entity\Traits\TimestampableTrait;
 
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RoleRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(name="roles")
  */
 class Role
 {
+    use TimestampableTrait;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

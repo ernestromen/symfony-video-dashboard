@@ -85,7 +85,7 @@
               >
                 <!-- start here -->
 
-                <div class="border pl-3 py-2">
+                <div class="border">
                   <!-- experiment -->
                   <nav
                     class="navbar navbar-dark navbar-toggler bg-dark"
@@ -122,7 +122,6 @@
                     >
                       <div
                         class="border pl-3 py-2"
-                        :class="{'mb-4': index === category.videos.length - 1}"
                         @click="changeVideoFilePath(categoryVideo.video_file_path)"
                       >
                         {{ categoryVideo.video_file_path }}
