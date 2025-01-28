@@ -89,7 +89,35 @@
       </ul>
     </nav>
 
-    <main class="content text-center">
+    <div class="row mt-5">
+      <div class="col-12" />
+    </div>
+    <div
+      v-if="isLoading"
+      class="m-auto pt-5"
+    >
+      <p>Loading...</p>
+    </div>
+
+    <div
+      v-else-if="hasError"
+      class="row col"
+    >
+      <error-message :error="error" />
+    </div>
+
+    <div
+      v-else-if="!hasEntities"
+      class="m-auto"
+    >
+      No entities!
+    </div>
+
+
+    <main
+      v-else
+      class="content text-center"
+    >
       <h1 class="page_h1">
         {{ entities }}
       </h1>
@@ -116,13 +144,15 @@
                 class="btn btn-primary"
                 title="add video"
                 :href="`add-video`"
-              ><font-awesome-icon :icon="['fas', 'plus']" /></a>
+              ><font-awesome-icon
+                :icon="['fas', 'plus']"
+              /></a>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="el in list"
+            v-for="el in entities2"
             :key="el.id"
           >
             <td>
@@ -153,98 +183,113 @@
       </table>
       <!--  -->
     </main>
-
-
-    <div class="row mt-5">
-      <div class="col-12" />
-    </div>
   </div>
 </template>
 
 
 <script>
 import axios from "axios";
+import ErrorMessage from "../components/ErrorMessage";
 
 export default {
+  name: "Dashboard",
+  components: {
+    ErrorMessage,
+  },
   data: function () {
     return {
 
-      list:[],
-      first_th:'User ID',
-      second_th:'User login',
+      list: [],
+      first_th: 'User ID',
+      second_th: 'User login',
       first_td: 'id',
-      second_td:'login',
-      entity_type:'user',
-      entities:'users',
-      delete_route:'',
+      second_td: 'login',
+      entity_type: 'user',
+      entities: 'users',
+      delete_route: '',
       videoFile: null,
       inputData: '',
       csrfToken: '',
-      neededEntities:'',
+      neededEntities: '',
+      rand: 'random value'
 
     };
   },
   computed: {
-
+    isLoading() {
+      return this.$store.getters["entity/isLoading"];
+    },
+    hasError() {
+      return this.$store.getters["entity/hasError"];
+    },
+    error() {
+      return this.$store.getters["entity/error"];
+    },
+    hasEntities() {
+      return this.$store.getters["entity/hasEntities"];
+    },
+    entities2() {
+      return this.$store.getters["entity/entities2"];
+    }
   },
   created() {
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     // console.log(this.$store.getters["security/getUser"].id);
-
+    this.$store.dispatch("entity/findAll", this.entities);
   },
   mounted() {
-    this.getAllEntities();
-
   },
   methods: {
 
-    filter(){
-      if(this.entities == 'videos'){
+    filter() {
+      if (this.entities == 'videos') {
         this.list = this.list.filter(entity => entity.categoryId == 27);
       }
     },
-    check(event){
+    check(event) {
 
       const spanText = event.target.querySelector("span").textContent;
       // active_nav
 
-    if(spanText == 'Categories'){
-      this.first_th = 'Category ID';
-      this.second_th = 'Category Name';
+      if (spanText == 'Categories') {
+        this.first_th = 'Category ID';
+        this.second_th = 'Category Name';
 
-      this.first_td = 'id';
-      this.second_td = 'name';
+        this.first_td = 'id';
+        this.second_td = 'name';
 
-      this.entity_type = 'category';
+        this.entity_type = 'category';
 
-      this.entities = 'categories';
+        this.entities = 'categories';
 
-    }else if(spanText == 'Videos'){
+      } else if (spanText == 'Videos') {
 
-      this.first_th = 'Video Name';
-      this.second_th = 'Category ID';
+        this.first_th = 'Video Name';
+        this.second_th = 'Category ID';
 
-      this.first_td = 'video_name';
-      this.second_td = 'category_id';
+        this.first_td = 'video_name';
+        this.second_td = 'category_id';
 
-      this.entity_type = 'video';
+        this.entity_type = 'video';
 
-      this.entities = 'videos';
+        this.entities = 'videos';
 
 
-    }else if(spanText == 'Users'){
+      } else if (spanText == 'Users') {
 
-      this.first_th = 'User ID';
-      this.second_th = 'User login';
+        this.first_th = 'User ID';
+        this.second_th = 'User login';
 
-      this.first_td = 'id';
-      this.second_td = 'login';
+        this.first_td = 'id';
+        this.second_td = 'login';
 
-      this.entity_type = 'user';
+        this.entity_type = 'user';
 
-      this.entities = 'users';
-    }
-    this.getAllEntities();
+        this.entities = 'users';
+      }
+      // this.getAllEntities();
+
+      this.$store.dispatch("entity/findAll", spanText.toLowerCase());
 
     },
 
@@ -253,34 +298,34 @@ export default {
       let FileResult = e.target.querySelector('input[type="file"]').files[0];
 
       const formData = new FormData();
-      
+
       formData.append('userId', this.$store.getters["security/getUser"].id);
-      formData.append('video', FileResult,'file');
-      
+      formData.append('video', FileResult, 'file');
+
       axios
-        .post('http://app.localhost/api/upload-video',formData
-     
-      )
+        .post('http://app.localhost/api/upload-video', formData
+
+        )
         .then((res) => {
-          this.videos.push({'videoName':res.data,'videoFilePath':res.data})
+          this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
         })
         .catch((error) => {
           console.log(error, 'this is my error');
         });
     },
 
-    deleteEntity(id){
+    deleteEntity(id) {
 
-      if(this.entity_type == 'category'){
+      if (this.entity_type == 'category') {
 
         let str = this.entity_type;
         str = str.slice(0, -1);
         this.neededEntities = str + 's';
 
-      }else{
+      } else {
         this.neededEntities = this.entity_type + 's';
       }
-      
+
       this.list = this.list.filter(entity => entity.id !== id);
 
       axios
@@ -290,23 +335,14 @@ export default {
           { headers: { "content-type": "application/json" } }
         )
         .then(res => {
-console.log(res);
+          console.log(res);
         })
         .catch((error) => {
           console.log(error);
-        });   
+        });
  },
 
 
-        getAllEntities(){
-          axios.get(`http://app.localhost/api/get-${this.entities}`)
-        .then((res) => {
-         this.list = res.data;
-         console.log(res.data);
-        })
-        .catch(() => {
-        });
-        },
   },
 };
 </script>

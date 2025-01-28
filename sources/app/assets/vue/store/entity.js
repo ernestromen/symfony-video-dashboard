@@ -1,4 +1,4 @@
-import CategoryAPI from "../api/category";
+import EntityAPI from "../api/entity";
 
 const CREATING_CATEGORY = "CREATING_CATEGORY",
   CREATING_CATEGORY_SUCCESS = "CREATING_CATEGORY_SUCCESS",
@@ -12,7 +12,7 @@ export default {
   state: {
     isLoading: false,
     error: null,
-    categories: []
+    entities2: []
   },
   getters: {
     isLoading(state) {
@@ -24,11 +24,11 @@ export default {
     error(state) {
       return state.error;
     },
-    hasCategories(state) {
-      return state.categories.length > 0;
+    hasEntities(state) {
+      return state.entities2.length > 0;
     },
-    categories(state) {
-      return state.categories;
+    entities2(state) {
+      return state.entities2;
     }
   },
   mutations: {
@@ -39,34 +39,46 @@ export default {
     [CREATING_CATEGORY_SUCCESS](state, category) {
       state.isLoading = false;
       state.error = null;
-      state.categories.unshift(category);
+      state.entities2.unshift(category);
     },
     [CREATING_CATEGORY_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.categories = [];
+      state.entities2 = [];
     },
     [FETCHING_CATEGORIES](state) {
       state.isLoading = true;
       state.error = null;
-      state.categories = [];
+      state.entities2 = [];
     },
-    [FETCHING_CATEGORIES_SUCCESS](state, categories) {
+    [FETCHING_CATEGORIES_SUCCESS](state, entities2) {
       state.isLoading = false;
       state.error = null;
-      state.categories = categories;
+      state.entities2 = entities2;
     },
     [FETCHING_CATEGORIES_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.categories = [];
+      state.entities2 = [];
     }
   },
   actions: {
+    async create({ commit }, message) {
+      commit(CREATING_CATEGORY);
+      try {
+        let response = await EntityAPI.create(message);
+        commit(CREATING_CATEGORY_SUCCESS, response.data);
+        return response.data;
+      } catch (error) {
+        commit(CREATING_CATEGORY_ERROR, error);
+        return null;
+      }
+    },
     async findAll({ commit },payload) {
+      console.log('find all in entity');
       commit(FETCHING_CATEGORIES);
       try {
-        let response = await CategoryAPI.findAll(payload);
+        let response = await EntityAPI.findAll(payload);
         commit(FETCHING_CATEGORIES_SUCCESS, response.data);
         return response.data;
       } catch (error) {

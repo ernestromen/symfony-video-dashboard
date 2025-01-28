@@ -266,14 +266,14 @@ final class PostController extends AbstractController
     {
         try {
             $videoToEdit = $this->em->getRepository(Video::class)->find($id);
-            $data = $this->serializer->serialize($videoToEdit, JsonEncoder::FORMAT);
+            $data = $this->serializer->serialize($videoToEdit, JsonEncoder::FORMAT,['groups' => ['category:read']]);
 
             if (!$videoToEdit) {
                 throw $this->createNotFoundException('Video not found.');
             }
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
     }
 
@@ -339,14 +339,14 @@ final class PostController extends AbstractController
     {
         try {
             $categoryToEdit = $this->em->getRepository(Category::class)->find($id);
-            $data = $this->serializer->serialize($categoryToEdit, JsonEncoder::FORMAT);
+            $data = $this->serializer->serialize($categoryToEdit, JsonEncoder::FORMAT,['groups' => ['category:read']]);
 
             if (!$categoryToEdit) {
                 throw $this->createNotFoundException('Video not found.');
             }
             return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
 
     }
@@ -409,7 +409,8 @@ final class PostController extends AbstractController
 
         try {
             $userToEdit = $this->em->getRepository(User::class)->find($id);
-            $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT);
+            // dd($userToEdit);
+            $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT,['groups' => ['user:read']]);
 
             if (!$userToEdit) {
                 throw $this->createNotFoundException('User not found.');

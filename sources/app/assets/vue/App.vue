@@ -24,14 +24,6 @@
       >
         <ul class="navbar-nav">
           <router-link
-            class="nav-item"
-            tag="li"
-            to="/posts"
-            active-class="active"
-          >
-            <a class="nav-link">Posts</a>
-          </router-link>
-          <router-link
             v-if="currentUser !== null && currentUser.login === 'admin'"
 
             class="nav-item"

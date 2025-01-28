@@ -2,7 +2,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import SecurityModule from "./security";
 import PostModule from "./post";
-import CategoryModule from "./category";
+import EntityModule from "./entity";
+import CategoryAPIModule from "./category";
 
 
 Vue.use(Vuex);
@@ -11,6 +12,7 @@ export default new Vuex.Store({
   modules: {
     security: SecurityModule,
     post: PostModule,
-    category: CategoryModule
+    entity: EntityModule,
+    category: CategoryAPIModule
   }
 });
