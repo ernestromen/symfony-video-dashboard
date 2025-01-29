@@ -409,7 +409,6 @@ final class PostController extends AbstractController
 
         try {
             $userToEdit = $this->em->getRepository(User::class)->find($id);
-            // dd($userToEdit);
             $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT,['groups' => ['user:read']]);
 
             if (!$userToEdit) {
@@ -430,12 +429,14 @@ final class PostController extends AbstractController
 
         try {
             $userToUpdate = $this->em->getRepository(User::class)->find($id);
+            $roleToUpdate = $this->em->getRepository(Role::class)->find($request->request->get('role'));
 
             if (!$userToUpdate) {
                 throw $this->createNotFoundException('User not found.');
             }
 
             $userToUpdate->setLogin($request->request->get('userName'));
+            $userToUpdate->getUserRoles()->first()->setRole($roleToUpdate);
 
             $this->em->persist($userToUpdate);
             $this->em->flush();

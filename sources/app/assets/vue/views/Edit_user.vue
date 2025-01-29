@@ -11,22 +11,22 @@
       </div>
       <div class="form-group">
         <select
+          v-model="roleEntity"
           class="form-control custom-select"
-          name="categoryId"
+          name="roleId"
         >
           <option
             value=""
             disabled
-            selected
           >
             Select an option
           </option>
           <option
-            v-for="category in categories"
-            :key="category.id"
-            :value="category.id"
+            v-for="role in roles"
+            :key="role.id"
+            :value="role.id"
           >
-            {{ category.name }}
+            {{ role.name }}
           </option>
         </select>
       </div>
@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
   name: "Editcategory",
@@ -53,49 +52,28 @@ export default {
   },
   data: function () {
     return {
-      user: [],
+      roleEntity:"",
     };
   },
   computed: {
-    categories() {
-      return this.$store.getters["category/categories"];
-    },
 
+    roles() {
+      return this.$store.getters["role/roles"];
+    },
+    user() {
+      return this.$store.getters["user/user"];
+    },
   },
+
   created() {
-    this.$store.dispatch("category/findAll");
+    this.$store.dispatch("role/findAll");
+    this.$store.dispatch("user/findUserById",this.id);
   },
 
-  mounted() {
-    this.getUser();
-  },
   methods: {
-    getUser() {
-      axios
-        .get(`http://app.localhost/api/edit-user/${this.id}`)
-        .then((res) => {
-          this.user = res.data;
-        })
-        .catch(() => {
-        });
-    },
-
     handleSubmit(e) {
       e.preventDefault();
-
-                axios
-                    .post(`http://app.localhost/api/update-user/${this.id}`,{userName: this.user.login}
-    
-                    )
-                    .then((res) => {
-                        console.log(res.data, 'res is here2');
-                        // this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
-    
-                        // console.log(this.videos);
-                    })
-                    .catch((error) => {
-                        console.log(error, 'this is my error');
-                    });
+      this.$store.dispatch("user/updateUser",{userId: this.user.id,userName: this.user.login,role:this.roleEntity});
             }
         }
     };
