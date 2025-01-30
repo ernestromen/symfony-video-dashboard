@@ -114,7 +114,7 @@
                     class="collapse"
                   >
                     <div
-                      v-for="(categoryVideo, index) in category.videos"
+                      v-for="(categoryVideo) in category.videos"
                       
                       :id="`navbarToggleExternalContent${category.id}`"
                       :key="categoryVideo.id"

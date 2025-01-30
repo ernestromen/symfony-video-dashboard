@@ -8,5 +8,13 @@ export default {
   },
   findAll($entities) {
     return axios.get(`http://app.localhost/api/get-${$entities}`);
+  },
+  delete(payload){
+        return axios
+        .delete(
+          `http://app.localhost/api/delete-${payload.entityType}/${payload.id}`,
+          { data: payload.id },
+          { headers: { "content-type": "application/json" } }
+        );
   }
 };

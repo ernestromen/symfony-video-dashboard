@@ -98,7 +98,6 @@ this.getAllRoles();
   methods: {
 
     handleSubmit(e) {
-// console.log('this.csrfToken:',this.csrfToken)
       let FileResult = e.target.querySelector('input[type="file"]').files[0];
       let categoryId = e.target.querySelector('select[name="categoryId"]').value;
       let roleId = e.target.querySelector('select[name="roleId"]').value;

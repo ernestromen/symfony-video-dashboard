@@ -58,7 +58,7 @@ router.beforeEach((to, from, next) => {
     // if not, redirect to login page.
 
     if (store.getters["security/isAuthenticated"]) {
-      // to.fullPath == '/dashboard' &&  store.getters["security/getUser"].login !== 'admin' ? next({path: "/",query: { redirect: to.fullPath }}) : '';
+      to.fullPath == '/dashboard' &&  store.getters["security/getUser"].login !== 'admin' ? next({path: "/",query: { redirect: to.fullPath }}) : '';
       next();
     } else {
       next({

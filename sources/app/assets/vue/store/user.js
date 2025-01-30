@@ -124,7 +124,6 @@ export default {
       commit(UPDATING_USER);
       try {
         let response = await UserAPI.updateUser(payload);
-        console.log(response.data,'response');
         commit(UPDATING_USER_SUCCESS, response.data);
         return response.data;
       } catch (error) {

@@ -119,11 +119,11 @@
       class="content text-center"
     >
       <h1 class="page_h1">
-        {{ entities }}
+        {{ entitiesName }}
       </h1>
 
       <button
-        v-if="entities === 'videos'"
+        v-if="entitiesName === 'videos'"
         class="btn btn-success"
         @click="filter"
       >
@@ -139,7 +139,7 @@
             <th class="border-bottom-0">
               {{ second_th }}
             </th>
-            <th v-if="entities === 'videos'">
+            <th v-if="entitiesName === 'videos'">
               <a
                 class="btn btn-primary"
                 title="add video"
@@ -152,7 +152,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="el in entities2"
+            v-for="el in entities"
             :key="el.id"
           >
             <td>
@@ -188,7 +188,6 @@
 
 
 <script>
-import axios from "axios";
 import ErrorMessage from "../components/ErrorMessage";
 
 export default {
@@ -205,14 +204,11 @@ export default {
       first_td: 'id',
       second_td: 'login',
       entity_type: 'user',
-      entities: 'users',
+      entitiesName: 'users',
       delete_route: '',
       videoFile: null,
-      inputData: '',
       csrfToken: '',
       neededEntities: '',
-      rand: 'random value'
-
     };
   },
   computed: {
@@ -228,24 +224,24 @@ export default {
     hasEntities() {
       return this.$store.getters["entity/hasEntities"];
     },
-    entities2() {
-      return this.$store.getters["entity/entities2"];
+    entities() {
+      return this.$store.getters["entity/entities"];
     }
   },
   created() {
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    // console.log(this.$store.getters["security/getUser"].id);
-    this.$store.dispatch("entity/findAll", this.entities);
+    this.$store.dispatch("entity/findAll", this.entitiesName);
   },
+
   mounted() {
   },
   methods: {
 
-    filter() {
-      if (this.entities == 'videos') {
-        this.list = this.list.filter(entity => entity.categoryId == 27);
-      }
-    },
+    // filter() {
+    //   if (this.entities == 'videos') {
+    //     this.list = this.list.filter(entity => entity.categoryId == 27);
+    //   }
+    // },
     check(event) {
 
       const spanText = event.target.querySelector("span").textContent;
@@ -260,7 +256,7 @@ export default {
 
         this.entity_type = 'category';
 
-        this.entities = 'categories';
+        this.entitiesName = 'categories';
 
       } else if (spanText == 'Videos') {
 
@@ -272,7 +268,7 @@ export default {
 
         this.entity_type = 'video';
 
-        this.entities = 'videos';
+        this.entitiesName = 'videos';
 
 
       } else if (spanText == 'Users') {
@@ -285,37 +281,14 @@ export default {
 
         this.entity_type = 'user';
 
-        this.entities = 'users';
+        this.entitiesName = 'users';
       }
-      // this.getAllEntities();
 
       this.$store.dispatch("entity/findAll", spanText.toLowerCase());
 
     },
 
-    handleSubmit(e) {
-
-      let FileResult = e.target.querySelector('input[type="file"]').files[0];
-
-      const formData = new FormData();
-
-      formData.append('userId', this.$store.getters["security/getUser"].id);
-      formData.append('video', FileResult, 'file');
-
-      axios
-        .post('http://app.localhost/api/upload-video', formData
-
-        )
-        .then((res) => {
-          this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
-        })
-        .catch((error) => {
-          console.log(error, 'this is my error');
-        });
-    },
-
     deleteEntity(id) {
-
       if (this.entity_type == 'category') {
 
         let str = this.entity_type;
@@ -326,23 +299,8 @@ export default {
         this.neededEntities = this.entity_type + 's';
       }
 
-      this.list = this.list.filter(entity => entity.id !== id);
-
-      axios
-        .delete(
-          `http://app.localhost/api/delete-${this.entity_type}/${id}`,
-          { data: id },
-          { headers: { "content-type": "application/json" } }
-        )
-        .then(res => {
-          console.log(res);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.$store.dispatch("entity/delete",{entityType:this.entity_type,id:id});
  },
-
-
   },
 };
 </script>

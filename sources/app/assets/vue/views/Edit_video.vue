@@ -3,7 +3,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <input
-          v-model="video.videoFilePath"
+          v-model="video.video_file_path"
           type="text"
           class="form-control"
           placeholder="Enter file path"
@@ -19,7 +19,6 @@
           <option
             value=""
             disabled
-            selected
           >
             Select an option
           </option>
@@ -55,7 +54,8 @@ export default {
   },
   data: function () {
     return {
-      video: []
+      video: [],
+      categorType: '',
     };
   },
   computed: {
@@ -88,17 +88,17 @@ export default {
 
       e.preventDefault();
 
-      axios
-        .post(`http://app.localhost/api/update-video/${this.id}`, { videoFilePath: this.video.videoFilePath,categoryId: this.video.categoryId }
+      // axios
+      //   .post(`http://app.localhost/api/update-video/${this.id}`, { videoFilePath: this.video.videoFilePath,categoryId: this.video.categoryId }
 
-        )
-        .then((res) => {
-          this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
+      //   )
+      //   .then((res) => {
+      //     this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
 
-        })
-        .catch((error) => {
-          console.log(error, 'this is my error');
-        });
+      //   })
+      //   .catch((error) => {
+      //     console.log(error, 'this is my error');
+      //   });
     }
   }
 };

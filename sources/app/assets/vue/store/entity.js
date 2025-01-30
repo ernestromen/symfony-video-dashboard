@@ -3,6 +3,9 @@ import EntityAPI from "../api/entity";
 const CREATING_CATEGORY = "CREATING_CATEGORY",
   CREATING_CATEGORY_SUCCESS = "CREATING_CATEGORY_SUCCESS",
   CREATING_CATEGORY_ERROR = "CREATING_CATEGORY_ERROR",
+  DELETING_ENTITY = 'DELETING_ENTITY',
+  DELETING_ENTITY_SUCCESS='DELETING_ENTITY_SUCCESS',
+  DELETING_ENTITY_ERROR = 'DELETING_ENTITY_ERROR',
   FETCHING_CATEGORIES = "FETCHING_CATEGORIES",
   FETCHING_CATEGORIES_SUCCESS = "FETCHING_CATEGORIES_SUCCESS",
   FETCHING_CATEGORIES_ERROR = "FETCHING_CATEGORIES_ERROR";
@@ -12,7 +15,7 @@ export default {
   state: {
     isLoading: false,
     error: null,
-    entities2: []
+    entities: []
   },
   getters: {
     isLoading(state) {
@@ -25,10 +28,10 @@ export default {
       return state.error;
     },
     hasEntities(state) {
-      return state.entities2.length > 0;
+      return state.entities.length > 0;
     },
-    entities2(state) {
-      return state.entities2;
+    entities(state) {
+      return state.entities;
     }
   },
   mutations: {
@@ -39,27 +42,41 @@ export default {
     [CREATING_CATEGORY_SUCCESS](state, category) {
       state.isLoading = false;
       state.error = null;
-      state.entities2.unshift(category);
+      state.entities.unshift(category);
     },
     [CREATING_CATEGORY_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.entities2 = [];
+      state.entities = [];
     },
     [FETCHING_CATEGORIES](state) {
       state.isLoading = true;
       state.error = null;
-      state.entities2 = [];
+      state.entities = [];
     },
-    [FETCHING_CATEGORIES_SUCCESS](state, entities2) {
+    [FETCHING_CATEGORIES_SUCCESS](state, entities) {
       state.isLoading = false;
       state.error = null;
-      state.entities2 = entities2;
+      state.entities = entities;
     },
     [FETCHING_CATEGORIES_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.entities2 = [];
+      state.entities = [];
+    },
+    [DELETING_ENTITY](state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    [DELETING_ENTITY_SUCCESS](state,id) {
+      state.entities =  state.entities.filter(entity => entity.id !== id);
+      state.isLoading = false;
+      state.error = null;
+    },
+    [DELETING_ENTITY_ERROR](state, error) {
+      state.isLoading = false;
+      state.error = error;
+      state.entities = [];
     }
   },
   actions: {
@@ -83,6 +100,19 @@ export default {
         return response.data;
       } catch (error) {
         commit(FETCHING_CATEGORIES_ERROR, error);
+        return null;
+      }
+    },
+    async delete({ commit },payload){
+      commit(DELETING_ENTITY);
+      try {
+
+        let response = await EntityAPI.delete(payload);
+        commit(DELETING_ENTITY_SUCCESS, payload.id);
+
+        return response.data;
+      } catch (error) {
+        commit(DELETING_ENTITY_ERROR, error);
         return null;
       }
     }

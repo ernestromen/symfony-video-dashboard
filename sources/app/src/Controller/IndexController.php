@@ -32,11 +32,11 @@ final class IndexController extends AbstractController
     {
         
         // $token = $this->container->get('security.token_storage')->getToken();
-        // dd($token);
+
         /** @var User|null $user */
         $user = $this->getUser();
         $data = null;
-        // dd($user);
+
         if (!empty($user)) {
             $userClone = clone $user;
             $userClone->setPassword('');

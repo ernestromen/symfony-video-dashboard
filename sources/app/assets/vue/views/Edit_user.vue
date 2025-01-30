@@ -52,7 +52,7 @@ export default {
   },
   data: function () {
     return {
-      roleEntity:"",
+      roleEntity:'',
     };
   },
   computed: {
@@ -74,7 +74,7 @@ export default {
     handleSubmit(e) {
       e.preventDefault();
       this.$store.dispatch("user/updateUser",{userId: this.user.id,userName: this.user.login,role:this.roleEntity});
-            }
+            },
         }
     };
     </script>
