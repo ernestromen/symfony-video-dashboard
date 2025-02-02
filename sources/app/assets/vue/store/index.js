@@ -6,6 +6,7 @@ import EntityModule from "./entity";
 import CategoryAPIModule from "./category";
 import RoleAPIModule from "./role";
 import UserAPIModule from "./user";
+import VideoAPIModule from "./video";
 
 
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     entity: EntityModule,
     category: CategoryAPIModule,
     role: RoleAPIModule,
-    user:UserAPIModule
-  }
+    user:UserAPIModule,
+    video:VideoAPIModule
+  },
 });

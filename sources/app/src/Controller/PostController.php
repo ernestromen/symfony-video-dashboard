@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 use App\Entity\Video;
+use App\Entity\VideoRole;
 use App\Entity\Post;
 use App\Entity\Category;
 use App\Entity\User;
@@ -114,7 +115,6 @@ final class PostController extends AbstractController
 
             $video->setUserId($userId);
             $video->setCategory($category);
-            $video->addRole($role);
 
             $videoFile = $request->files->get('video');
 
@@ -128,14 +128,24 @@ final class PostController extends AbstractController
                 );
 
                 $video->setVideoFilePath($newFilename);
-                $video->setVideoName($newFilename);
 
+                $videoRole = new VideoRole();
+                $videoRole->setRole($role);
+                $videoRole->setVideo($video);
 
+                $video->getVideoRoles()->add($videoRole);
                 $this->em->persist($video);
                 $this->em->flush();
             }
 
-            return new JsonResponse($newFilename, Response::HTTP_CREATED, [], true);
+            $responseData = [
+                "message" => "You have successfully updated the video",
+                "video" => $video
+            ];
+
+            $data = $this->serializer->serialize($responseData, JsonEncoder::FORMAT, ['groups' => ['video:read']]);
+
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
 
         } catch (\Exception $e) {
             return new Response($e->getMessage(), 500);
@@ -167,7 +177,6 @@ final class PostController extends AbstractController
         $query->setParameter('userId', $currentLoggedInUserId);
 
         $categoriesWithFilteredVideos = $query->getResult();
-
         $categoriesWithFilteredVideosCollection = new ArrayCollection($categoriesWithFilteredVideos);
 
         $categories = $this->em->getRepository(Category::class)->findAll();
@@ -237,7 +246,6 @@ final class PostController extends AbstractController
     {
 
         $videoToDelete = $this->em->getRepository(Video::class)->find($id);
-        $videoFilePath = $videoToDelete->getVideoName();
         $videoPath = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/' . $videoFilePath;
         unlink($videoPath);
 
@@ -266,7 +274,7 @@ final class PostController extends AbstractController
     {
         try {
             $videoToEdit = $this->em->getRepository(Video::class)->find($id);
-            $data = $this->serializer->serialize($videoToEdit, JsonEncoder::FORMAT,['groups' => ['category:read']]);
+            $data = $this->serializer->serialize($videoToEdit, JsonEncoder::FORMAT, ['groups' => ['video:read']]);
 
             if (!$videoToEdit) {
                 throw $this->createNotFoundException('Video not found.');
@@ -299,12 +307,17 @@ final class PostController extends AbstractController
             $this->em->persist($videoToUpdate);
             $this->em->flush();
 
-            $data = $this->serializer->serialize('you have successfully updated', JsonEncoder::FORMAT);
+            $responseData = [
+                "message" => "You have successfully updated the video",
+                "video" => $videoToUpdate
+            ];
+
+            $data = $this->serializer->serialize($responseData, JsonEncoder::FORMAT, ['groups' => ['video:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new Response($e->getMessage(), 500);
         }
 
     }
@@ -363,12 +376,15 @@ final class PostController extends AbstractController
                 throw $this->createNotFoundException('Category not found.');
             }
 
-            $categoryToUpdate->setCategoryName($request->request->get('categoryName'));
+            $categoryToUpdate->setName($request->request->get('categoryName'));
 
             $this->em->persist($categoryToUpdate);
             $this->em->flush();
-
-            $data = $this->serializer->serialize('you have successfully updated', JsonEncoder::FORMAT);
+            $responseData = [
+                "message" => "You have successfully updated the category",
+                "category" => $categoryToUpdate
+            ];
+            $data = $this->serializer->serialize($responseData, JsonEncoder::FORMAT, ['groups' => ['category:read']]);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 

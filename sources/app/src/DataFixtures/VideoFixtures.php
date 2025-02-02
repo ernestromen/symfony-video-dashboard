@@ -15,8 +15,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-use App\Event\VideoCreationEvent;
-
 final class VideoFixtures extends Fixture
 {
     public const FIRST_VIDEO_PATH = 'file-678a9fabb0f99.mp4';
@@ -35,7 +33,6 @@ final class VideoFixtures extends Fixture
     public const SECOND_VIDEO_ROLE = 2;
     public const THIRD_VIDEO_ROLE = 3;
 
-    public const USERNAME = 'admin';
 
     /** @var EventDispatcherInterface */
     private $dispatcher;
@@ -53,26 +50,22 @@ final class VideoFixtures extends Fixture
     }
     public function load(ObjectManager $manager): void
     {
-        $this->createVideo($manager, self::FIRST_VIDEO_CATEGORY,self::USERNAME, self::FIRST_VIDEO_PATH,self::FIRST_VIDEO_ROLE);
-        $this->createVideo($manager, self::SECOND_VIDEO_CATEGORY,self::USERNAME, self::SECOND_VIDEO_PATH,self::SECOND_VIDEO_ROLE);
-        $this->createVideo($manager, self::THIRD_VIDEO_CATEGORY,self::USERNAME, self::THIRD_VIDEO_PATH,self::THIRD_VIDEO_ROLE);
+        $this->createVideo($manager, self::FIRST_VIDEO_CATEGORY, self::FIRST_VIDEO_PATH,self::FIRST_VIDEO_ROLE);
+        $this->createVideo($manager, self::SECOND_VIDEO_CATEGORY, self::SECOND_VIDEO_PATH,self::SECOND_VIDEO_ROLE);
+        $this->createVideo($manager, self::THIRD_VIDEO_CATEGORY, self::THIRD_VIDEO_PATH,self::THIRD_VIDEO_ROLE);
     }
 
     /**
      * @param string[] $roles
      */
-    private function createVideo(ObjectManager $manager, int $categoryId,string $username,string $videoPath, int $roleId): void
+    private function createVideo(ObjectManager $manager, int $categoryId,string $videoPath, int $roleId): void
     {
 
         $category = $this->em->getRepository(Category::class)->find($categoryId);
         $role = $this->em->getRepository(Role::class)->find($roleId);
 
-        $userId = $this->em->getRepository(User::class)->findOneBy(['login' => $username])->getId()->toString();
-
         $videoEntity = new Video();
         $videoEntity->setCategory($category);
-        $videoEntity->setUserId($userId);
-        $videoEntity->setVideoName($videoPath);
         $videoEntity->setVideoFilePath($videoPath);
 
         $videoRole = new VideoRole();

@@ -12,7 +12,7 @@
 
       <div class="form-group">
         <select
-          v-model="video.categoryId"
+          v-model="categoryType"
           class="form-control custom-select"
           name="categoryId"
         >
@@ -38,14 +38,38 @@
         Submit
       </button>
     </form>
+    <div
+      v-if="isLoading"
+      class="text-center pt-5"
+    >
+      <p>Loading...</p>
+    </div>
+
+    <div
+      v-else-if="hasError"
+      class="w-50 m-auto text-center pt-4"
+    >
+      <error-message :error="error" />
+    </div>
+    <div
+      v-else-if="hasSuccess"
+      class="w-50 m-auto text-center pt-4"
+    >
+      <success-message :success="success" />
+    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import ErrorMessage from "../components/ErrorMessage";
+import SuccessMessage from "../components/SuccessMessage";
 
 export default {
   name: "Editvideo",
+  components: {
+    ErrorMessage,
+    SuccessMessage
+  },
   props: {
     id: {
       type: [String, Number],
@@ -54,52 +78,48 @@ export default {
   },
   data: function () {
     return {
-      video: [],
-      categorType: '',
+      categoryType: '',
+      videoFilePath:'',
     };
   },
   computed: {
     categories() {
       return this.$store.getters["category/categories"];
     },
-
+    video() {
+      return this.$store.getters["video/video"];
+    },
+    isLoading() {
+      return this.$store.getters["video/isLoading"];
+    },
+    hasError() {
+      return this.$store.getters["video/hasError"];
+    },
+    hasSuccess() {
+      return this.$store.getters["video/hasSuccess"];
+    },
+    error() {
+      return this.$store.getters["video/error"];
+    },
+    success(){
+      return this.$store.getters["video/success"];
+    }
   },
   created() {
 
     this.$store.dispatch("category/findAll");
+    this.$store.dispatch("video/findVideoById",this.id);
+
 
   },
   mounted() {
-    this.getVideo();
-
   },
   methods: {
-    getVideo() {
-      axios
-        .get(`http://app.localhost/api/edit-video/${this.id}`)
-        .then((res) => {
-          this.video = res.data;
-        })
-        .catch(() => {
-        });
-    },
 
     handleSubmit(e) {
-
       e.preventDefault();
-
-      // axios
-      //   .post(`http://app.localhost/api/update-video/${this.id}`, { videoFilePath: this.video.videoFilePath,categoryId: this.video.categoryId }
-
-      //   )
-      //   .then((res) => {
-      //     this.videos.push({ 'videoName': res.data, 'videoFilePath': res.data })
-
-      //   })
-      //   .catch((error) => {
-      //     console.log(error, 'this is my error');
-      //   });
-    }
+      this.$store.dispatch("video/updateVideo",{ id:this.id,videoFilePath: this.video.video_file_path,categoryId: this.categoryType })
+       }
   }
 };
 </script>

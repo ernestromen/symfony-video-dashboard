@@ -37,13 +37,38 @@
         Submit
       </button>
     </form>
+    <div
+      v-if="isLoading"
+      class="text-center pt-5"
+    >
+      <p>Loading...</p>
+    </div>
+
+    <div
+      v-else-if="hasError"
+      class="w-50 m-auto text-center pt-4"
+    >
+      <error-message :error="error" />
+    </div>
+    <div
+      v-else-if="hasSuccess"
+      class="w-50 m-auto text-center pt-4"
+    >
+      <success-message :success="success" />
+    </div>
   </div>
 </template>
 
 <script>
+import ErrorMessage from "../components/ErrorMessage";
+import SuccessMessage from "../components/SuccessMessage";
 
 export default {
   name: "Editcategory",
+  components: {
+    ErrorMessage,
+    SuccessMessage
+  },
   props: {
     id: {
       type: [String, Number],
@@ -63,6 +88,21 @@ export default {
     user() {
       return this.$store.getters["user/user"];
     },
+    isLoading() {
+      return this.$store.getters["video/isLoading"];
+    },
+    hasError() {
+      return this.$store.getters["video/hasError"];
+    },
+    hasSuccess() {
+      return this.$store.getters["video/hasSuccess"];
+    },
+    error() {
+      return this.$store.getters["video/error"];
+    },
+    success(){
+      return this.$store.getters["video/success"];
+    }
   },
 
   created() {

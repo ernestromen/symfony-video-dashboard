@@ -260,10 +260,10 @@ export default {
 
       } else if (spanText == 'Videos') {
 
-        this.first_th = 'Video Name';
+        this.first_th = 'Video Path';
         this.second_th = 'Category ID';
 
-        this.first_td = 'video_name';
+        this.first_td = 'video_file_path';
         this.second_td = 'category_id';
 
         this.entity_type = 'video';

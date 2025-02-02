@@ -26,22 +26,11 @@ class Video
     private $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private $user_id;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"category:read"})
 
      */
     private $category_id;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"category:read"})
-     */
-    private $video_name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -93,11 +82,6 @@ class Video
         return $this->id;
     }
 
-    public function getUserId(): ?string
-    {
-        return $this->user_id;
-    }
-
     public function setUserId(?string $user_id): self
     {
         $this->user_id = $user_id;
@@ -113,18 +97,6 @@ class Video
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
-
-        return $this;
-    }
-
-    public function getVideoName(): ?string
-    {
-        return $this->video_name;
-    }
-
-    public function setVideoName(?string $video_name): self
-    {
-        $this->video_name = $video_name;
 
         return $this;
     }
@@ -159,7 +131,6 @@ class Video
     {
         if (!$this->roles->contains($role)) {
             $this->roles[] = $role;
-
         }
 
         return $this;
