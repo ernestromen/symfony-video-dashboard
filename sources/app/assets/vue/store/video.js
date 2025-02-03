@@ -95,10 +95,10 @@ export default {
     },
   },
   actions: {
-    async createVideo({ commit }, message) {
+    async createVideo({ commit }, payload) {
       commit(CREATING_VIDEO);
       try {
-        let response = await VideoAPI.createVideo(message);
+        let response = await VideoAPI.createVideo(payload);
         commit(CREATING_VIDEO_SUCCESS, response.data);
         return response.data;
       } catch (error) {

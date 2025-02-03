@@ -103,7 +103,6 @@ final class PostController extends AbstractController
     public function uploadVideo(Request $request)
     {
 
-        $userId = $request->request->get('userId');
         $categoryId = $request->request->get('categoryId');
         $roleId = $request->request->get('roleId');
 
@@ -113,7 +112,6 @@ final class PostController extends AbstractController
             $category = $this->em->getRepository(Category::class)->find($categoryId);
             $role = $this->em->getRepository(Role::class)->find($roleId);
 
-            $video->setUserId($userId);
             $video->setCategory($category);
 
             $videoFile = $request->files->get('video');
@@ -139,7 +137,7 @@ final class PostController extends AbstractController
             }
 
             $responseData = [
-                "message" => "You have successfully updated the video",
+                "message" => "You have successfully uploaded the video",
                 "video" => $video
             ];
 
@@ -245,12 +243,11 @@ final class PostController extends AbstractController
     public function deleteVideo($id)
     {
 
-        $videoToDelete = $this->em->getRepository(Video::class)->find($id);
-        $videoPath = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/' . $videoFilePath;
-        unlink($videoPath);
-
         try {
             $videoToDelete = $this->em->getRepository(Video::class)->find($id);
+            $videoFilePath = $videoToDelete->getVideoFilePath();
+            $videoPath = $this->getParameter('kernel.project_dir') . '/public/uploads/videos/' . $videoFilePath;
+            unlink($videoPath);
 
             if (!$videoToDelete) {
                 throw $this->createNotFoundException('Video not found.');

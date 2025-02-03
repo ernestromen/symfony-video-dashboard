@@ -82,13 +82,6 @@ class Video
         return $this->id;
     }
 
-    public function setUserId(?string $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
-    }
-
     public function getCategoryId(): ?int
     {
         return $this->category_id;

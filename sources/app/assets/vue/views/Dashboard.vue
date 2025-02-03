@@ -122,13 +122,7 @@
         {{ entitiesName }}
       </h1>
 
-      <button
-        v-if="entitiesName === 'videos'"
-        class="btn btn-success"
-        @click="filter"
-      >
-        Filter
-      </button>
+
       <!-- experimental table -->
       <table class="table table-striped border mt-5">
         <thead>
@@ -144,6 +138,15 @@
                 class="btn btn-primary"
                 title="add video"
                 :href="`add-video`"
+              ><font-awesome-icon
+                :icon="['fas', 'plus']"
+              /></a>
+            </th>
+            <th v-if="entitiesName === 'categories'">
+              <a
+                class="btn btn-primary"
+                title="add category"
+                :href="`add-category`"
               ><font-awesome-icon
                 :icon="['fas', 'plus']"
               /></a>
