@@ -89,40 +89,12 @@
       </ul>
     </nav>
 
-    <div class="row mt-5">
-      <div class="col-12" />
-    </div>
-    <div
-      v-if="isLoading"
-      class="m-auto pt-5"
-    >
-      <p>Loading...</p>
-    </div>
-
-    <div
-      v-else-if="hasError"
-      class="row col"
-    >
-      <error-message :error="error" />
-    </div>
-
-    <div
-      v-else-if="!hasEntities"
-      class="m-auto"
-    >
-      No entities!
-    </div>
-
-
     <main
-      v-else
       class="content text-center"
     >
       <h1 class="page_h1">
         {{ entitiesName }}
       </h1>
-
-
       <!-- experimental table -->
       <table class="table table-striped border mt-5">
         <thead>
@@ -184,7 +156,25 @@
           </tr>
         </tbody>
       </table>
-      <!--  -->
+      <div
+        v-if="isLoading"
+        class="text-center pt-5"
+      >
+        <p>Loading...</p>
+      </div>
+
+      <div
+        v-else-if="hasError"
+        class="w-50 m-auto text-center pt-4"
+      >
+        <error-message :error="error" />
+      </div>
+      <div
+        v-else-if="hasSuccess"
+        class="w-50 m-auto text-center pt-4"
+      >
+        <success-message :success="success" />
+      </div>
     </main>
   </div>
 </template>

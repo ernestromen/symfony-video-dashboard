@@ -15,7 +15,6 @@ export default {
   },
 
   updateUser(payload){
-    console.log(payload,'this is the payload');
    return axios.post(`http://app.localhost/api/update-user/${payload.userId}`,{userName: payload.userName,role:payload.role});
 
   }

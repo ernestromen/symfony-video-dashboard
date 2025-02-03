@@ -155,10 +155,8 @@ final class PostController extends AbstractController
      */
     public function getCategories()
     {
-        // $categories = $this->em->getRepository(Category::class)->findAll();
         $currentLoggedInUserId = $this->getUser()->getId();
 
-        // Query to fetch categories with their associated filtered videos
         $query = $this->em->createQuery(
             'SELECT c, v
      FROM App\Entity\Category c
@@ -259,7 +257,10 @@ final class PostController extends AbstractController
 
             return new JsonResponse('succesfully deleted!', Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_NOT_FOUND
+            );
         }
 
     }
@@ -382,6 +383,31 @@ final class PostController extends AbstractController
                 "category" => $categoryToUpdate
             ];
             $data = $this->serializer->serialize($responseData, JsonEncoder::FORMAT, ['groups' => ['category:read']]);
+
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+
+        } catch (\Exception $e) {
+            echo new Response($e->getMessage(), 500);
+        }
+
+    }
+    
+    /**
+     * @Rest\Post("/create-category", name="createCategory")
+     */
+    public function createCategory(Request $request)
+    {
+        try {
+            $category = new Category();
+
+
+
+            $category->setName($request->request->get('categoryName'));
+
+            $this->em->persist($category);
+            $this->em->flush();
+    
+            $data = $this->serializer->serialize(["message" => "You have successfully created the category"], JsonEncoder::FORMAT);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
 

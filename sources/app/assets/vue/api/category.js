@@ -1,10 +1,8 @@
 import axios from "axios";
-// the issue is here!
+
 export default {
-  create(message) {
-    return axios.post("/api/get-categories", {
-      message: message
-    });
+  createCategory(payload) {
+    return axios.post("/api/create-category",{"categoryName":payload});
   },
   findCategoryById(id){
     return axios.get(`http://app.localhost/api/edit-category/${id}`);

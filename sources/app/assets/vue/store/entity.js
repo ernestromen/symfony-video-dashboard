@@ -76,7 +76,9 @@ export default {
     [DELETING_ENTITY_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.entities = [];
+      setTimeout(() => {
+        state.error = null;
+      }, "3000");
     }
   },
   actions: {
@@ -92,7 +94,6 @@ export default {
       }
     },
     async findAll({ commit },payload) {
-      console.log('find all in entity');
       commit(FETCHING_CATEGORIES);
       try {
         let response = await EntityAPI.findAll(payload);

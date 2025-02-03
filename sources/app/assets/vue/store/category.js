@@ -57,12 +57,14 @@ export default {
     [CREATING_CATEGORY_SUCCESS](state, category) {
       state.isLoading = false;
       state.error = null;
-      state.categories.unshift(category);
+      state.success = category.message;
+      setTimeout(() => {
+        state.success = null;
+      }, "3000");
     },
     [CREATING_CATEGORY_ERROR](state, error) {
       state.isLoading = false;
       state.error = error;
-      state.categories = [];
     },
     [FETCHING_CATEGORY](state) {
       state.isLoading = true;
@@ -117,6 +119,17 @@ export default {
   },
   
   actions: {
+    async createCategory({ commit },payload) {
+      commit(CREATING_CATEGORY);
+      try {
+        let response = await CategoryAPI.createCategory(payload);
+        commit(CREATING_CATEGORY_SUCCESS, response.data);
+        return response.data;
+      } catch (error) {
+        commit(CREATING_CATEGORY_ERROR, error);
+        return null;
+      }
+    },
 
     async findCategoryById({ commit },id) {
       commit(FETCHING_CATEGORY);
@@ -140,7 +153,6 @@ export default {
         return response.data;
 
       } catch (error) {
-        console.log('WHAT')
         commit(UPDATING_CATEGORY_ERROR, error);
         return null;
       }

@@ -204,8 +204,6 @@ export default {
   },
   created() {
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    // console.log(this.$store.getters["security/getUser"].id);
-
   },
   mounted() {
     this.getAllVideos();
