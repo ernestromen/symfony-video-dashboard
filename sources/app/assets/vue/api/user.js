@@ -1,10 +1,8 @@
 import axios from "axios";
 
 export default {
-  create(message) {
-    return axios.post("/api/get-users", {
-      message: message
-    });
+  createUser(payload) {
+    return axios.post("/api/create-user", {userName:payload.userName, roleId: payload.roleId,password: payload.password});
   },
   findAll() {
     return axios.get('/api/users');

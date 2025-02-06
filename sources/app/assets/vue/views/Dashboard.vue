@@ -5,12 +5,13 @@
         <li class="px-0">
           <div class="pos-f-t">
             <nav
+              ref="usersNav"
               class="navbar navbar-dark navbar-toggler bg-dark active_nav"
               data-toggle="collapse"
               @click="check($event)"
             >
               <span
-                class="navbar-toggler"
+                class="navbar-toggler border-0"
                 type="button"
                 data-toggle="collapse"
                 aria-controls="navbarToggleExternalContent"
@@ -33,12 +34,13 @@
         <li class="px-0">
           <div class="pos-f-t">
             <nav
+              ref="videosNav"
               class="navbar navbar-dark navbar-toggler bg-dark"
               data-toggle="collapse"
               @click="check($event)"
             >
               <span
-                class="navbar-toggler"
+                class="navbar-toggler border-0"
                 type="button"
                 data-toggle="collapse"
                 aria-controls="navbarToggleExternalContent2"
@@ -61,12 +63,13 @@
         <li class="px-0">
           <div class="pos-f-t">
             <nav
+              ref="categoriesNav"
               class="navbar navbar-dark navbar-toggler bg-dark"
               data-toggle="collapse"
               @click="check($event)"
             >
               <span
-                class="navbar-toggler"
+                class="navbar-toggler border-0"
                 type="button"
                 data-toggle="collapse"
                 aria-controls="navbarToggleExternalContent3"
@@ -123,6 +126,15 @@
                 :icon="['fas', 'plus']"
               /></a>
             </th>
+            <th v-if="entitiesName === 'users'">
+              <a
+                class="btn btn-primary"
+                title="add user"
+                :href="`add-user`"
+              ><font-awesome-icon
+                :icon="['fas', 'plus']"
+              /></a>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -141,6 +153,7 @@
                 class="btn btn-success"
                 style="cursor: pointer;"
                 :href="`edit-${entity_type}/` + el.id"
+                :disabled="el.login === 'admin'"
               >
                 edit
               </a>
@@ -148,6 +161,7 @@
             <td>
               <button
                 class="btn btn-danger"
+                :disabled="el.login === 'admin'"
                 @click="deleteEntity(el.id)"
               >
                 delete
@@ -182,11 +196,13 @@
 
 <script>
 import ErrorMessage from "../components/ErrorMessage";
+import SuccessMessage from "../components/SuccessMessage";
 
 export default {
   name: "Dashboard",
   components: {
     ErrorMessage,
+    SuccessMessage
   },
   data: function () {
     return {
@@ -211,14 +227,23 @@ export default {
     hasError() {
       return this.$store.getters["entity/hasError"];
     },
+    hasSuccess() {
+      return this.$store.getters["entity/hasSuccess"];
+    },
     error() {
       return this.$store.getters["entity/error"];
+    },
+    success() {
+      return this.$store.getters["entity/success"];
     },
     hasEntities() {
       return this.$store.getters["entity/hasEntities"];
     },
     entities() {
       return this.$store.getters["entity/entities"];
+    },
+    currentUser(){
+      return this.$store.getters["security/getUser"];
     }
   },
   created() {
@@ -239,6 +264,19 @@ export default {
 
       const spanText = event.target.querySelector("span").textContent;
       // active_nav
+
+      this.$refs.usersNav.classList.remove('active_nav');
+      this.$refs.videosNav.classList.remove('active_nav');
+      this.$refs.categoriesNav.classList.remove('active_nav');
+
+      // Add the 'active_nav' class to the clicked nav
+      if (spanText === 'Users') {
+        this.$refs.usersNav.classList.add('active_nav');
+      } else if (spanText === 'Videos') {
+        this.$refs.videosNav.classList.add('active_nav');
+      } else if (spanText === 'Categories') {
+        this.$refs.categoriesNav.classList.add('active_nav');
+      }
 
       if (spanText == 'Categories') {
         this.first_th = 'Category ID';

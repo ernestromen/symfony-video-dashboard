@@ -12,8 +12,9 @@ export default {
   state: {
     isLoading: false,
     error: null,
+    success: null,
     isAuthenticated: false,
-    user: null
+    user: null,
   },
   getters: {
     isLoading(state) {
@@ -24,6 +25,12 @@ export default {
     },
     error(state) {
       return state.error;
+    },
+    hasSuccess(state) {
+      return state.success !== null;
+    },
+    success(state) {
+      return state.success;
     },
     isAuthenticated(state) {
       return state.isAuthenticated;
@@ -68,11 +75,15 @@ export default {
       state.isAuthenticated = false;
       state.user = null;
     },
-    [REGISTRATION_SUCCESS](state, user) {
+    [REGISTRATION_SUCCESS](state, response) {
       state.isLoading = false;
       state.error = null;
       state.isAuthenticated = true;
-      state.user = user;
+      state.success = response.message;
+      state.user = response.user;
+      setTimeout(() => {
+        state.success = null;
+      }, "3000");
     },
     [REGISTRATION_ERROR](state, error) {
       state.isLoading = false;

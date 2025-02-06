@@ -75,14 +75,13 @@ export default {
   },
     created() {
         this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
     },
     methods: {
 
         handleSubmit(e) {
             e.preventDefault();
             this.$store.dispatch("category/createCategory", this.categoryName);
-
+            this.categoryName = '';
         },
     },
 };

@@ -65,26 +65,39 @@ final class SecurityController extends AbstractController
      */
     public function register(Request $request): JsonResponse
     {
-        $login = $request->request->get('login');
-        $password = $request->request->get('password');
+        try {
+            $login = $request->request->get('login');
+            $password = $request->request->get('password');
 
-        $newUser = new User();
-        $newUser->setLogin($login);
-        $newUser->setPlainPassword($password);
+            $newUser = new User();
+            $newUser->setLogin($login);
+            $newUser->setPlainPassword($password);
 
-        $role = $this->em->getRepository(Role::class)->find(2);
+            $role = $this->em->getRepository(Role::class)->find(2);
 
-        $userRole = new UserRole();
-        $userRole->setUser($newUser);
-        $userRole->setRole($role);
+            $userRole = new UserRole();
+            $userRole->setUser($newUser);
+            $userRole->setRole($role);
 
-        $newUser->getUserRoles()->add($userRole);
+            $newUser->getUserRoles()->add($userRole);
 
-        $this->em->persist($newUser);
-        $this->em->flush();
+            $this->em->persist($newUser);
+            $this->em->flush();
 
-        $data = $this->serializer->serialize(["message" => "hello from 2000 years in the future"], JsonEncoder::FORMAT);
+            $responseData = [
+                "message" => "hello from 2000 years in the future",
+                "user" => $newUser
+            ];
 
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
+            $data = $this->serializer->serialize($responseData, JsonEncoder::FORMAT, ['groups' => ['user:read']]);
+            
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_NOT_FOUND
+            );
+        }
     }
 }

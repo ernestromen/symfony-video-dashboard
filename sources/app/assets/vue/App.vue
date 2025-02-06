@@ -44,6 +44,7 @@
           </li>
         </ul>
       </div>
+      <span v-if="isAuthenticated">{{ currentUser.login }}</span>
     </nav>
 
     <router-view />

@@ -10,6 +10,7 @@ import Editcategory from "../views/Edit_category";
 import Edituser from "../views/Edit_user";
 import VideoDisplay from "../views/Video_display";
 import AddVideo from "../views/AddVideo";
+import addUser from "../views/addUser";
 import addCategory from "../views/addCategory";
 import CategoryPage from "../views/CategoryPage";
 
@@ -52,6 +53,11 @@ let router = new VueRouter({
         {
           path: "/add-category",
           component: addCategory,
+          props: true          
+        },
+        {
+          path: "/add-user",
+          component: addUser,
           props: true          
         },
     { path: "*", redirect: "/" }

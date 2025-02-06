@@ -9,6 +9,7 @@ use App\Entity\Post;
 use App\Entity\Category;
 use App\Entity\User;
 use App\Entity\Role;
+use App\Entity\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -336,9 +337,14 @@ final class PostController extends AbstractController
 
             $this->em->flush();
 
-            return new JsonResponse('succesfully deleted!', Response::HTTP_OK, [], true);
+            $data = $this->serializer->serialize(["message" => "You have successfully deleted the category"], JsonEncoder::FORMAT, ['groups' => ['video:read']]);
+
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
         } catch (\Exception $e) {
-            echo new Response($e->getMessage(), 500);
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_NOT_FOUND
+            );
         }
     }
 
@@ -350,7 +356,7 @@ final class PostController extends AbstractController
     {
         try {
             $categoryToEdit = $this->em->getRepository(Category::class)->find($id);
-            $data = $this->serializer->serialize($categoryToEdit, JsonEncoder::FORMAT,['groups' => ['category:read']]);
+            $data = $this->serializer->serialize($categoryToEdit, JsonEncoder::FORMAT, ['groups' => ['category:read']]);
 
             if (!$categoryToEdit) {
                 throw $this->createNotFoundException('Video not found.');
@@ -391,7 +397,7 @@ final class PostController extends AbstractController
         }
 
     }
-    
+
     /**
      * @Rest\Post("/create-category", name="createCategory")
      */
@@ -406,7 +412,7 @@ final class PostController extends AbstractController
 
             $this->em->persist($category);
             $this->em->flush();
-    
+
             $data = $this->serializer->serialize(["message" => "You have successfully created the category"], JsonEncoder::FORMAT);
 
             return new JsonResponse($data, Response::HTTP_OK, [], true);
@@ -432,8 +438,11 @@ final class PostController extends AbstractController
             $this->em->remove($userToDelete);
 
             $this->em->flush();
+            
+            $data = $this->serializer->serialize(["message" => "You have successfully deleted the user"], JsonEncoder::FORMAT, ['groups' => ['video:read']]);
 
-            return new JsonResponse('succesfully deleted!', Response::HTTP_OK, [], true);
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+
         } catch (\Exception $e) {
             echo new Response($e->getMessage(), 500);
         }
@@ -448,7 +457,7 @@ final class PostController extends AbstractController
 
         try {
             $userToEdit = $this->em->getRepository(User::class)->find($id);
-            $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT,['groups' => ['user:read']]);
+            $data = $this->serializer->serialize($userToEdit, JsonEncoder::FORMAT, ['groups' => ['user:read']]);
 
             if (!$userToEdit) {
                 throw $this->createNotFoundException('User not found.');
@@ -493,11 +502,35 @@ final class PostController extends AbstractController
     /**
      * 
      *
-     * @Rest\Post("/register", name="register")
+     * @Rest\Post("/create-user", name="createUser")
      */
-    public function register(Request $request): void
+    public function createUser(Request $request): JsonResponse
     {
-        dd($request);
+        try {
+            $newUser = new User();
+            $newUser->setLogin($request->request->get('userName'));
+            $newUser->setPlainPassword($request->request->get('password'));
+
+            $role = $this->em->getRepository(Role::class)->find($request->request->get('roleId'));
+
+            $userRole = new UserRole();
+            $userRole->setUser($newUser);
+            $userRole->setRole($role);
+            $newUser->getUserRoles()->add($userRole);
+
+            $this->em->persist($newUser);
+            $this->em->flush();
+
+            $data = $this->serializer->serialize(["message" => "You have successfully added a user!"], JsonEncoder::FORMAT, ['groups' => ['user:read']]);
+
+            return new JsonResponse("$data", Response::HTTP_OK, [], true);
+
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => $e->getMessage()],
+                Response::HTTP_NOT_FOUND
+            );
+        }
     }
     /**
      * @Rest\Get("/test", name="test")

@@ -39,27 +39,34 @@
   
     <div
       v-if="isLoading"
-      class="row col"
+      class="text-center pt-5"
     >
       <p>Loading...</p>
     </div>
-  
     <div
       v-else-if="hasError"
-      class="row col"
+      class="w-50 m-auto text-center pt-4"
     >
       <error-message :error="error" />
+    </div>
+    <div
+      v-else-if="hasSuccess"
+      class="w-50 m-auto text-center pt-4"
+    >
+      <success-message :success="success" />
     </div>
   </div>
 </template>
   
   <script>
   import ErrorMessage from "../components/ErrorMessage";
-  
+  import SuccessMessage from "../components/SuccessMessage";
+
   export default {
     name: "Register",
     components: {
       ErrorMessage,
+      SuccessMessage
     },
     data() {
       return {
@@ -76,6 +83,12 @@
       },
       error() {
         return this.$store.getters["security/error"];
+      },
+      hasSuccess() {
+      return this.$store.getters["security/hasSuccess"];
+      },
+      success() {
+        return this.$store.getters["security/success"];
       },
       getState() {
         return this.$store.getters["security/getState"];
@@ -95,17 +108,19 @@
     },
     methods: {
       async performRegister() {
-        let payload = {login: this.$data.login, password: this.$data.password};
-          // redirect = this.$route.query.redirect;
-  
+        let payload = {login: this.$data.login, password: this.$data.password},
+          redirect = this.$route.query.redirect;
+
         await this.$store.dispatch("security/register", payload);
-        // if (!this.$store.getters["security/hasError"]) {
-        //   if (typeof redirect !== "undefined") {
-        //     this.$router.push({path: redirect});
-        //   } else {
-        //     this.$router.push({path: "/"});
-        //   }
-        // }
+
+        await this.$store.dispatch("security/login", payload);
+        if (!this.$store.getters["security/hasError"]) {
+          if (typeof redirect !== "undefined") {
+            this.$router.push({path: redirect});
+          } else {
+            this.$router.push({path: "/"});
+          }
+        }
       }
     }
   }

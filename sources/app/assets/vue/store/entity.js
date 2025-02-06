@@ -15,6 +15,7 @@ export default {
   state: {
     isLoading: false,
     error: null,
+    success:null,
     entities: []
   },
   getters: {
@@ -26,6 +27,12 @@ export default {
     },
     error(state) {
       return state.error;
+    },
+    hasSuccess(state) {
+      return state.success !== null;
+    },
+    success(state) {
+      return state.success;
     },
     hasEntities(state) {
       return state.entities.length > 0;
@@ -68,10 +75,14 @@ export default {
       state.isLoading = true;
       state.error = null;
     },
-    [DELETING_ENTITY_SUCCESS](state,id) {
-      state.entities =  state.entities.filter(entity => entity.id !== id);
+    [DELETING_ENTITY_SUCCESS](state,payload) {
+      state.entities =  state.entities.filter(entity => entity.id !== payload.id);
       state.isLoading = false;
       state.error = null;
+      state.success = payload.response.message;
+      setTimeout(() => {
+        state.success = null;
+      }, "3000");
     },
     [DELETING_ENTITY_ERROR](state, error) {
       state.isLoading = false;
@@ -109,7 +120,7 @@ export default {
       try {
 
         let response = await EntityAPI.delete(payload);
-        commit(DELETING_ENTITY_SUCCESS, payload.id);
+        commit(DELETING_ENTITY_SUCCESS, {response: response.data,id:payload.id});
 
         return response.data;
       } catch (error) {

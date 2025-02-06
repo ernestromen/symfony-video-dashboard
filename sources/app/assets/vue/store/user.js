@@ -1,14 +1,17 @@
 import UserAPI from "../api/user";
 
-const FETCHING_USERS = "FETCHING_USERS",
-  FETCHING_USERS_SUCCESS = "FETCHING_USERS_SUCCESS",
-  FETCHING_USERS_ERROR = "FETCHING_USERS_ERROR",
-  FETCHING_USER = "FETCHING_USER",
-  FETCHING_USER_SUCCESS = "FETCHING_USER_SUCCESS",
-  FETCHING_USER_ERROR = "FETCHING_USER_ERROR",
+const FETCHING_USERS = 'FETCHING_USERS',
+  FETCHING_USERS_SUCCESS = 'FETCHING_USERS_SUCCESS',
+  FETCHING_USERS_ERROR = 'FETCHING_USERS_ERROR',
+  FETCHING_USER = 'FETCHING_USER',
+  FETCHING_USER_SUCCESS = 'FETCHING_USER_SUCCESS',
+  FETCHING_USER_ERROR = 'FETCHING_USER_ERROR',
   UPDATING_USER = 'UPDATING_USER',
   UPDATING_USER_SUCCESS = 'UPDATING_USER_SUCCESS',
-  UPDATING_USER_ERROR = 'UPDATING_USER_ERROR';
+  UPDATING_USER_ERROR = 'UPDATING_USER_ERROR',
+  CREATING_USER = 'CREATING_USER',
+  CREATING_USER_SUCCESS = 'CREATING_USER_SUCCESS',
+  CREATING_USER_ERROR = 'CREATING_USER_ERROR';
 
 
 export default {
@@ -16,6 +19,7 @@ export default {
   state: {
     isLoading: false,
     error: null,
+    success:null,
     users: [],
     user:[]
   },
@@ -26,8 +30,14 @@ export default {
     hasError(state) {
       return state.error !== null;
     },
+    hasSuccess(state) {
+      return state.success !== null;
+    },
     error(state) {
       return state.error;
+    },
+    success(state) {
+      return state.success;
     },
     hasUsers(state) {
       return state.users.length > 0;
@@ -85,19 +95,37 @@ export default {
       state.error = error;
       state.user = [];
     },
+    [CREATING_USER](state) {
+      state.isLoading = true;
+      state.error = null;
+      state.user = [];
+    },
+    [CREATING_USER_SUCCESS](state, response) {
+      state.isLoading = false;
+      state.error = null;
+      state.success = response.message;
+      setTimeout(() => {
+        state.success = null;
+      }, "3000");
+    },
+    [CREATING_USER_ERROR](state, error) {
+      state.isLoading = false;
+      state.error = error;
+      state.user = [];
+    },
   },
   actions: {
-    // async create({ commit }, message) {
-      // commit(CREATING_USER);
-      // try {
-      //   let response = await UserAPI.create(message);
-      //   commit(CREATING_USER_SUCCESS, response.data);
-      //   return response.data;
-      // } catch (error) {
-      //   commit(CREATING_USER_ERROR, error);
-      //   return null;
-      // }
-    // },
+    async createUser({ commit }, message) {
+      commit(CREATING_USER);
+      try {
+        let response = await UserAPI.createUser(message);
+        commit(CREATING_USER_SUCCESS, response.data);
+        return response.data;
+      } catch (error) {
+        commit(CREATING_USER_ERROR, error);
+        return null;
+      }
+    },
     async findAll({ commit },payload) {
       commit(FETCHING_USERS);
       try {
