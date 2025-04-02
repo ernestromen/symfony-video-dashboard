@@ -1,31 +1,33 @@
 <template>
   <div>
-    <div class="row col">
-      <h1>Login</h1>
+    <div class="row col justify-content-center">
+      <h1 class="text-light mt-3">
+        Login
+      </h1>
     </div>
 
-    <div class="row col">
+    <div class="row col justify-content-center">
       <form>
-        <div class="form-row">
-          <div class="col-4">
+        <div class="form-row justify-content-center">
+          <div class="col-12 mt-2">
             <input
               v-model="login"
               type="text"
               class="form-control"
             >
           </div>
-          <div class="col-4">
+          <div class="col-12 mt-2">
             <input
               v-model="password"
               type="password"
               class="form-control"
             >
           </div>
-          <div class="col-4">
+          <div class="col-12 mt-2">
             <button
               :disabled="login.length === 0 || password.length === 0 || isLoading"
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary w-100"
               @click="performLogin()"
             >
               Login
@@ -33,7 +35,7 @@
           </div>
           <div class="pl-2">
             <a
-              class=""
+              class="text-light"
               href="/register"
             >Register here!</a>
           </div>
